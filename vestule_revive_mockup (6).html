@@ -1,0 +1,2136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Vestule Revive — Scripture for the Quiet Hours</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://js.paystack.co/v2/inline.js"></script>
+<style>
+  :root{
+    --ink:#10151C;
+    --ink-2:#161C25;
+    --ink-3:#1D242F;
+    --parchment:#EDE6D6;
+    --parchment-dim:#A8A296;
+    --amber:#C8893F;
+    --amber-soft:#C8893F33;
+    --sage:#6B8470;
+    --line:#2A313C;
+    --danger:#B0584A;
+    --radius:18px;
+    --serif:'Source Serif 4', Georgia, serif;
+    --sans:'Inter', -apple-system, sans-serif;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{
+    background:var(--ink);
+    color:var(--parchment);
+    font-family:var(--sans);
+    height:100%;
+    -webkit-font-smoothing:antialiased;
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.01ms !important; transition-duration:0.01ms !important;}
+  }
+
+  #app{
+    max-width:430px;
+    margin:0 auto;
+    min-height:100vh;
+    position:relative;
+    display:flex;
+    flex-direction:column;
+    background:
+      radial-gradient(ellipse 600px 400px at 50% -10%, #1C2330 0%, transparent 60%),
+      var(--ink);
+  }
+
+  .screen{ display:none; flex:1; flex-direction:column; padding-bottom:92px; min-height:100vh; }
+  .screen.active{ display:flex; }
+  .scroll-area{ flex:1; overflow-y:auto; padding: 28px 24px 24px; }
+
+  /* ---------- Top bar ---------- */
+  .topbar{
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 22px 24px 4px;
+  }
+  .topbar .wordmark{
+    font-family:var(--serif); font-size:20px; font-weight:600; letter-spacing:0.01em;
+    color:var(--parchment);
+  }
+  .topbar .wordmark span{ color:var(--amber); }
+  .streak-pill{
+    display:flex; align-items:center; gap:6px;
+    background:var(--ink-3); border:1px solid var(--line);
+    padding:6px 12px; border-radius:999px;
+    font-size:13px; font-weight:600; color:var(--amber);
+  }
+  .streak-pill svg{ width:14px; height:14px; }
+
+  /* ---------- Home screen ---------- */
+  .greeting{
+    font-family:var(--serif); font-size:26px; line-height:1.3; font-weight:500;
+    color:var(--parchment); margin: 6px 0 4px;
+  }
+  .greeting-sub{ color:var(--parchment-dim); font-size:14px; margin-bottom:28px; }
+
+  .today-card{
+    background:linear-gradient(160deg, var(--ink-3), var(--ink-2));
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:24px;
+    margin-bottom:28px;
+    position:relative;
+    overflow:hidden;
+  }
+  .today-card .eyebrow{
+    font-size:11px; letter-spacing:0.12em; text-transform:uppercase;
+    color:var(--sage); font-weight:600; margin-bottom:10px;
+  }
+  .today-card .verse-ref{
+    font-family:var(--serif); font-size:19px; color:var(--parchment); margin-bottom:14px; font-weight:500;
+  }
+  .today-card .verse-text{
+    font-family:var(--serif); font-size:15px; line-height:1.6; color:var(--parchment-dim);
+    margin-bottom:20px;
+  }
+  .play-row{ display:flex; align-items:center; gap:14px; }
+  .mini-play{
+    width:46px; height:46px; border-radius:50%;
+    background:var(--amber); color:var(--ink);
+    display:flex; align-items:center; justify-content:center;
+    border:none; cursor:pointer; flex-shrink:0;
+  }
+  .mini-play svg{ width:18px; height:18px; }
+  .play-meta{ font-size:13px; color:var(--parchment-dim); }
+  .play-meta strong{ color:var(--parchment); display:block; font-size:14px; margin-bottom:2px; }
+
+  .section-label{
+    font-size:12px; letter-spacing:0.1em; text-transform:uppercase;
+    color:var(--parchment-dim); font-weight:600; margin-bottom:14px;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .section-label a{ color:var(--amber); text-decoration:none; font-size:12px; text-transform:none; letter-spacing:0; cursor:pointer; }
+
+  .pkg-row{ display:flex; gap:12px; overflow-x:auto; margin-bottom:32px; padding-bottom:4px; scrollbar-width:none; }
+  .pkg-row::-webkit-scrollbar{ display:none; }
+  .pkg-spine{
+    flex-shrink:0; width:128px; height:168px; border-radius:14px;
+    padding:16px; display:flex; flex-direction:column; justify-content:space-between;
+    cursor:pointer; border:1px solid var(--line); position:relative;
+  }
+  .pkg-spine .pkg-icon{ font-size:22px; opacity:0.9; }
+  .pkg-spine .pkg-name{ font-family:var(--serif); font-size:15px; font-weight:600; line-height:1.25; }
+  .pkg-spine .pkg-count{ font-size:11px; color:var(--parchment-dim); }
+  .pkg-spine .lock{
+    position:absolute; top:12px; right:12px; width:22px; height:22px;
+    background:#00000055; border-radius:50%; display:flex; align-items:center; justify-content:center;
+  }
+  .pkg-spine .lock svg{ width:11px; height:11px; }
+
+  .stat-strip{
+    display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:8px;
+  }
+  .stat-box{
+    background:var(--ink-3); border:1px solid var(--line); border-radius:14px;
+    padding:14px 10px; text-align:center;
+  }
+  .stat-box .num{ font-family:var(--serif); font-size:22px; color:var(--amber); font-weight:600; }
+  .stat-box .lbl{ font-size:11px; color:var(--parchment-dim); margin-top:2px; }
+
+  /* ---------- Bottom nav ---------- */
+  .bottomnav{
+    position:fixed; bottom:0; left:50%; transform:translateX(-50%);
+    width:100%; max-width:430px;
+    background:#161C25E6; backdrop-filter:blur(16px);
+    border-top:1px solid var(--line);
+    display:flex; justify-content:space-around; align-items:center;
+    padding: 12px 12px calc(12px + env(safe-area-inset-bottom));
+    z-index:50;
+  }
+  .navbtn{
+    display:flex; flex-direction:column; align-items:center; gap:4px;
+    background:none; border:none; color:var(--parchment-dim); cursor:pointer;
+    font-family:var(--sans); font-size:11px; font-weight:500; width:64px;
+  }
+  .navbtn svg{ width:21px; height:21px; }
+  .navbtn.active{ color:var(--amber); }
+
+  /* ---------- Packages screen ---------- */
+  .pkg-grid-item{
+    display:flex; gap:16px; padding:18px; margin-bottom:12px;
+    background:var(--ink-3); border:1px solid var(--line); border-radius:var(--radius);
+    cursor:pointer; align-items:center;
+  }
+  .pkg-grid-item .pkg-thumb{
+    width:56px; height:56px; border-radius:12px; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center; font-size:24px;
+  }
+  .pkg-grid-item .pkg-info{ flex:1; min-width:0; }
+  .pkg-grid-item .pkg-title{ font-family:var(--serif); font-size:16px; font-weight:600; margin-bottom:3px; }
+  .pkg-grid-item .pkg-desc{ font-size:12.5px; color:var(--parchment-dim); line-height:1.4; }
+  .pkg-grid-item .pkg-price{ font-size:13px; font-weight:600; color:var(--amber); flex-shrink:0; }
+  .pkg-grid-item .pkg-price.owned{ color:var(--sage); font-size:11px; text-transform:uppercase; letter-spacing:0.05em; }
+  .trial-note{ text-align:center; font-size:12px; color:var(--sage); margin-bottom:12px; font-weight:500; }
+  .pkg-grid-item .pkg-price.trial{ color:var(--sage); font-size:11px; }
+
+  .allaccess-banner{
+    background:linear-gradient(135deg, #C8893F22, #6B847022);
+    border:1px solid var(--amber-soft); border-radius:16px;
+    padding:18px; margin-bottom:20px; display:flex; align-items:center; justify-content:space-between; gap:12px;
+    cursor:pointer;
+  }
+  .allaccess-banner .aa-text{ flex:1; }
+  .allaccess-banner .aa-title{ font-family:var(--serif); font-size:15.5px; font-weight:600; color:var(--parchment); margin-bottom:3px; }
+  .allaccess-banner .aa-sub{ font-size:12px; color:var(--parchment-dim); }
+  .allaccess-banner .aa-price{ font-family:var(--serif); font-size:18px; font-weight:700; color:var(--amber); flex-shrink:0; }
+  .allaccess-banner.unlocked{ background:#6B847022; border-color:#6B847055; cursor:default; }
+  .allaccess-banner.unlocked .aa-price{ color:var(--sage); font-size:13px; }
+
+  .view-toggle{
+    display:flex; background:var(--ink-3); border:1px solid var(--line); border-radius:11px;
+    padding:3px; margin-bottom:20px; gap:3px;
+  }
+  .view-toggle button{
+    flex:1; padding:9px; border:none; background:none; color:var(--parchment-dim);
+    font-family:var(--sans); font-size:12.5px; font-weight:600; border-radius:8px; cursor:pointer;
+  }
+  .view-toggle button.active{ background:var(--amber); color:var(--ink); }
+
+  .cat-section{ margin-bottom:30px; }
+  .cat-header{ display:flex; align-items:center; gap:8px; margin-bottom:14px; }
+  .cat-header .cat-icon{ font-size:16px; }
+  .cat-header .cat-title{ font-family:var(--serif); font-size:16px; font-weight:600; }
+
+  .filter-chips{ display:flex; gap:8px; overflow-x:auto; margin-bottom:20px; padding-bottom:2px; scrollbar-width:none; }
+  .filter-chips::-webkit-scrollbar{ display:none; }
+  .chip{
+    flex-shrink:0; padding:8px 16px; border-radius:99px; border:1px solid var(--line);
+    background:var(--ink-3); color:var(--parchment-dim); font-size:12.5px; font-weight:600; cursor:pointer;
+  }
+  .chip.active{ background:var(--amber); color:var(--ink); border-color:var(--amber); }
+
+  /* ---------- Package detail screen ---------- */
+  .detail-hero{
+    padding: 40px 24px 28px; text-align:center; position:relative;
+  }
+  .back-btn{
+    position:absolute; top:22px; left:20px; width:36px; height:36px;
+    background:var(--ink-3); border:1px solid var(--line); border-radius:50%;
+    display:flex; align-items:center; justify-content:center; cursor:pointer; border:none;
+    color:var(--parchment);
+  }
+  .back-btn svg{ width:16px; height:16px; }
+  .detail-icon{
+    width:84px; height:84px; border-radius:22px; margin:0 auto 18px;
+    display:flex; align-items:center; justify-content:center; font-size:36px;
+  }
+  .detail-title{ font-family:var(--serif); font-size:24px; font-weight:600; margin-bottom:8px; }
+  .detail-sub{ font-size:13.5px; color:var(--parchment-dim); max-width:280px; margin:0 auto; line-height:1.5; }
+
+  .track-list{ padding: 4px 24px 24px; }
+  .track-item{
+    display:flex; align-items:center; gap:14px; padding:14px 4px;
+    border-bottom:1px solid var(--line); cursor:pointer;
+  }
+  .track-item:last-child{ border-bottom:none; }
+  .track-num{
+    width:32px; height:32px; border-radius:50%; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    background:var(--ink-3); color:var(--parchment-dim); font-size:13px; font-weight:600;
+  }
+  .track-item.playing .track-num{ background:var(--amber); color:var(--ink); }
+  .track-name{ font-family:var(--serif); font-size:15px; flex:1; }
+  .track-dur{ font-size:12px; color:var(--parchment-dim); }
+  .track-item.locked{ opacity:0.45; }
+
+  .cta-bar{ padding: 12px 24px 28px; }
+  .btn-primary{
+    width:100%; padding:16px; border-radius:14px; border:none;
+    background:var(--amber); color:var(--ink); font-family:var(--sans);
+    font-size:15px; font-weight:700; cursor:pointer;
+  }
+  .btn-ghost{
+    width:100%; padding:16px; border-radius:14px; border:1px solid var(--line);
+    background:transparent; color:var(--parchment); font-family:var(--sans);
+    font-size:15px; font-weight:600; cursor:pointer;
+  }
+
+  /* ---------- Player screen ---------- */
+  .player-screen{ justify-content:space-between; padding-bottom:0; }
+  .player-top{ display:flex; align-items:center; justify-content:space-between; padding:22px 22px 0; }
+  .player-top .pkg-tag{ font-size:12px; color:var(--parchment-dim); text-transform:uppercase; letter-spacing:0.08em; }
+  .player-center{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:20px 36px; text-align:center; }
+
+  .glow-wrap{ position:relative; width:220px; height:220px; display:flex; align-items:center; justify-content:center; margin-bottom:40px; }
+  .glow-ring{
+    position:absolute; width:100%; height:100%; border-radius:50%;
+    background: radial-gradient(circle, var(--amber-soft) 0%, transparent 70%);
+    opacity:0.6;
+  }
+  .glow-ring.breathing{ animation: breathe 3.2s ease-in-out infinite; }
+  @keyframes breathe{
+    0%,100%{ transform:scale(0.92); opacity:0.45; }
+    50%{ transform:scale(1.12); opacity:0.85; }
+  }
+  .play-main{
+    width:96px; height:96px; border-radius:50%;
+    background: linear-gradient(160deg, #D89A52, var(--amber));
+    border:none; color:var(--ink); cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    box-shadow: 0 8px 30px #C8893F44;
+    position:relative; z-index:2;
+  }
+  .play-main svg{ width:32px; height:32px; }
+
+  .verse-ref-big{ font-family:var(--serif); font-size:21px; font-weight:600; margin-bottom:14px; }
+  .verse-text-big{ font-family:var(--serif); font-size:16px; line-height:1.65; color:var(--parchment-dim); max-width:320px; }
+
+  .progress-wrap{ padding:0 28px; margin-bottom:6px; }
+  .progress-track{
+    height:3px; background:var(--line); border-radius:99px; overflow:visible; position:relative;
+    cursor:pointer; padding:12px 0; margin:-12px 0; /* invisible tap padding so a 3px bar is easy to hit on a phone */
+    background-clip:content-box;
+  }
+  .progress-fill{ height:3px; background:var(--amber); width:32%; border-radius:99px; transition:width .1s; position:relative; top:12px; }
+  .progress-fill::after{
+    content:''; position:absolute; right:-6px; top:50%; transform:translateY(-50%);
+    width:12px; height:12px; border-radius:50%; background:var(--amber);
+    box-shadow:0 1px 4px #00000055;
+  }
+  .time-row{ display:flex; justify-content:space-between; font-size:11px; color:var(--parchment-dim); margin-top:8px; }
+
+  .player-controls{ display:flex; align-items:center; justify-content:center; gap:36px; padding:18px 0 38px; }
+  .ctrl-btn{ background:none; border:none; color:var(--parchment-dim); cursor:pointer; display:flex; }
+  .ctrl-btn svg{ width:22px; height:22px; }
+  .ctrl-btn.distraction-free{ color:var(--sage); }
+
+  .distraction-banner{
+    margin: 0 24px 20px; padding:12px 16px; background:#6B847022; border:1px solid #6B847055;
+    border-radius:12px; font-size:12px; color:var(--sage); text-align:center; font-weight:500;
+  }
+
+  /* ---------- Reminder / settings screen ---------- */
+  .setting-row{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:18px 0; border-bottom:1px solid var(--line);
+  }
+  .setting-label{ font-size:14.5px; font-weight:500; }
+  .setting-sub{ font-size:12px; color:var(--parchment-dim); margin-top:2px; }
+  .toggle{
+    width:48px; height:28px; border-radius:99px; background:var(--ink-3); border:1px solid var(--line);
+    position:relative; cursor:pointer; flex-shrink:0;
+  }
+  .toggle.on{ background:var(--amber); border-color:var(--amber); }
+  .toggle .knob{
+    width:22px; height:22px; border-radius:50%; background:var(--parchment);
+    position:absolute; top:2px; left:2px; transition:left .2s;
+  }
+  .toggle.on .knob{ left:23px; background:var(--ink); }
+
+  .time-picker{
+    display:flex; align-items:center; gap:8px; background:var(--ink-3);
+    border:1px solid var(--line); padding:8px 14px; border-radius:10px;
+    font-size:14px; font-weight:600; color:var(--amber); width:fit-content; margin-top:14px;
+  }
+
+  .download-explainer{ font-size:12px; color:var(--parchment-dim); line-height:1.5; padding:12px 0 4px; }
+  .download-row{ display:flex; align-items:center; justify-content:space-between; padding:13px 0; border-bottom:1px solid var(--line); }
+  .download-row:last-child{ border-bottom:none; }
+  .dl-info{ flex:1; }
+  .dl-name{ font-size:14px; font-weight:500; }
+  .dl-size{ font-size:11.5px; color:var(--parchment-dim); margin-top:2px; }
+  .dl-action{ font-size:12px; font-weight:600; padding:7px 13px; border-radius:99px; cursor:pointer; border:1px solid var(--line); background:var(--ink-2); flex-shrink:0; }
+  .dl-action.downloaded{ color:var(--sage); border-color:#6B847055; background:none; }
+  .dl-action.downloading{ color:var(--amber); border-color:var(--amber-soft); background:none; }
+  .dl-action.not-downloaded{ color:var(--amber); }
+  .dl-progress-track{ height:3px; background:var(--line); border-radius:99px; overflow:hidden; margin-top:6px; width:100%; }
+  .dl-progress-fill{ height:100%; background:var(--amber); transition:width .2s; }
+
+  /* ---------- Streak / rewards screen ---------- */
+  .flame-hero{ text-align:center; padding: 36px 24px 24px; }
+  .flame-big{ font-size:56px; margin-bottom:10px; }
+  .flame-num{ font-family:var(--serif); font-size:42px; font-weight:700; color:var(--amber); }
+  .flame-lbl{ font-size:13px; color:var(--parchment-dim); text-transform:uppercase; letter-spacing:0.08em; margin-top:2px; }
+
+  .week-strip{ display:flex; justify-content:space-between; padding:0 24px 28px; }
+  .day-dot{ display:flex; flex-direction:column; align-items:center; gap:8px; }
+  .day-dot .dlabel{ font-size:10px; color:var(--parchment-dim); }
+  .day-dot .dcircle{
+    width:34px; height:34px; border-radius:50%; background:var(--ink-3); border:1px solid var(--line);
+    display:flex; align-items:center; justify-content:center; font-size:13px;
+  }
+  .day-dot .dcircle.done{ background:var(--amber); border-color:var(--amber); color:var(--ink); }
+  .day-dot .dcircle.today{ border-color:var(--amber); border-width:2px; color:var(--amber); }
+
+  .badge-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; padding:0 24px 24px; }
+  .badge-card{
+    background:var(--ink-3); border:1px solid var(--line); border-radius:16px;
+    padding:18px; text-align:center;
+  }
+  .badge-card.locked{ opacity:0.4; }
+  .badge-icon{ font-size:28px; margin-bottom:8px; }
+  .badge-name{ font-size:13px; font-weight:600; margin-bottom:3px; }
+  .badge-req{ font-size:11px; color:var(--parchment-dim); }
+
+  .track-cluster{ border-bottom:1px solid var(--line); }
+  .track-cluster:last-child{ border-bottom:none; }
+  .track-cluster .track-item{ border-bottom:none; padding-bottom:8px; }
+  .track-versecount{ font-size:11px; color:var(--parchment-dim); font-weight:400; margin-top:2px; }
+  .verse-sublist{ padding: 0 0 14px 46px; display:flex; flex-direction:column; gap:8px; }
+  .verse-subrow{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+  .verse-subref{ font-size:13px; color:var(--parchment-dim); cursor:pointer; flex:1; }
+  .verse-subref:hover{ color:var(--parchment); }
+  .add-btn{
+    font-size:11px; font-weight:600; color:var(--amber); background:none;
+    border:1px solid var(--amber-soft); padding:5px 10px; border-radius:99px; cursor:pointer; flex-shrink:0;
+  }
+  .add-btn.added{ color:var(--sage); border-color:#6B847055; }
+
+  .loop-btn.loop-active{ color:var(--amber); }
+
+  .playlist-item{
+    display:flex; align-items:center; gap:14px; padding:14px 4px;
+    border-bottom:1px solid var(--line);
+  }
+  .playlist-item:last-child{ border-bottom:none; }
+  .playlist-num{
+    width:32px; height:32px; border-radius:50%; flex-shrink:0; background:var(--ink-3);
+    display:flex; align-items:center; justify-content:center; font-size:14px;
+  }
+  .playlist-info{ flex:1; cursor:pointer; min-width:0; }
+  .playlist-ref{ font-family:var(--serif); font-size:14.5px; font-weight:600; }
+  .playlist-pkg{ font-size:11.5px; color:var(--parchment-dim); margin-top:1px; }
+  .playlist-remove{ background:none; border:none; color:var(--parchment-dim); cursor:pointer; padding:4px; }
+  .playlist-remove svg{ width:16px; height:16px; }
+  .empty-state{ text-align:center; padding:60px 30px; color:var(--parchment-dim); }
+  .empty-state .icon{ font-size:36px; margin-bottom:14px; }
+  .empty-state .title{ font-family:var(--serif); font-size:17px; color:var(--parchment); margin-bottom:6px; }
+  .empty-state .sub{ font-size:13px; line-height:1.5; }
+
+  /* ---------- My Own Verses (journal) ---------- */
+  .journal-explainer{ font-size:12px; color:var(--parchment-dim); line-height:1.5; margin-bottom:14px; }
+  .own-verse-card{
+    background:var(--ink-3); border:1px solid var(--line); border-radius:14px;
+    padding:16px; margin-bottom:10px;
+  }
+  .own-verse-top{ display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:8px; }
+  .own-verse-ref{ font-family:var(--serif); font-size:14.5px; font-weight:600; }
+  .own-verse-text{ font-family:var(--serif); font-size:13.5px; color:var(--parchment-dim); line-height:1.5; margin-bottom:10px; }
+  .own-verse-actions{ display:flex; gap:8px; }
+  .ov-btn{
+    font-size:11.5px; font-weight:600; padding:7px 12px; border-radius:99px; cursor:pointer; border:1px solid var(--line);
+    background:var(--ink-2); color:var(--parchment);
+  }
+  .ov-btn.primary{ background:var(--amber); color:var(--ink); border:none; }
+  .ov-delete{ background:none; border:none; color:var(--parchment-dim); cursor:pointer; padding:2px; flex-shrink:0; }
+  .ov-delete svg{ width:15px; height:15px; }
+  .ov-tts-badge{ font-size:10px; color:var(--sage); text-transform:uppercase; letter-spacing:0.05em; font-weight:600; }
+  .own-verse-loop-row{ display:flex; justify-content:flex-end; margin-bottom:10px; }
+  .ov-loop-btn{
+    font-size:12px; font-weight:600; padding:7px 13px; border-radius:99px; cursor:pointer;
+    border:1px solid var(--line); background:var(--ink-3); color:var(--parchment-dim);
+  }
+  .ov-loop-btn.active{ border-color:var(--amber); color:var(--amber); background:var(--amber-soft); }
+  .own-verse-card.playing{ border-color:var(--amber); }
+
+  .sheet-input-label{ font-size:12px; color:var(--parchment-dim); font-weight:600; margin-bottom:6px; margin-top:16px; }
+  .sheet-input{
+    width:100%; background:var(--ink-3); border:1px solid var(--line); border-radius:11px;
+    padding:12px 14px; color:var(--parchment); font-family:var(--sans); font-size:14px;
+  }
+  .sheet-input:focus{ outline:none; border-color:var(--amber); }
+  textarea.sheet-input{ resize:none; font-family:var(--serif); line-height:1.5; min-height:80px; }
+
+  /* ---------- Member switcher ---------- */
+  .member-switcher{ display:flex; gap:10px; overflow-x:auto; padding:20px 24px 4px; scrollbar-width:none; }
+  .member-switcher::-webkit-scrollbar{ display:none; }
+  .member-chip{
+    flex-shrink:0; display:flex; align-items:center; gap:8px;
+    background:var(--ink-3); border:1px solid var(--line); border-radius:99px;
+    padding:8px 14px 8px 8px; cursor:pointer;
+  }
+  .member-chip.active{ border-color:var(--amber); background:var(--amber-soft); }
+  .member-chip .m-avatar{
+    width:26px; height:26px; border-radius:50%; background:var(--ink); display:flex;
+    align-items:center; justify-content:center; font-size:13px;
+  }
+  .member-chip .m-name{ font-size:13px; font-weight:600; }
+  .member-chip .m-streak{ font-size:11px; color:var(--amber); font-weight:600; }
+
+  /* ---------- Daily memory verse ---------- */
+  .daily-verse-card{
+    margin:0 24px 28px; padding:22px; border-radius:var(--radius);
+    background:linear-gradient(160deg, var(--ink-3), var(--ink-2)); border:1px solid var(--line);
+  }
+  .daily-verse-card .dv-pkg{ font-size:11px; text-transform:uppercase; letter-spacing:0.08em; color:var(--sage); font-weight:600; margin-bottom:10px; }
+  .daily-verse-card .dv-ref{ font-family:var(--serif); font-size:18px; font-weight:600; margin-bottom:10px; }
+  .daily-verse-card .dv-text{ font-family:var(--serif); font-size:14.5px; line-height:1.6; color:var(--parchment-dim); margin-bottom:18px; }
+  .dv-actions{ display:flex; gap:10px; }
+  .dv-btn{
+    flex:1; padding:11px; border-radius:11px; border:1px solid var(--line); background:var(--ink-2);
+    color:var(--parchment); font-family:var(--sans); font-size:12.5px; font-weight:600; cursor:pointer; text-align:center;
+  }
+  .dv-btn.primary{ background:var(--amber); color:var(--ink); border:none; }
+  .mastery-pip{ display:inline-flex; gap:3px; margin-top:8px; }
+  .mastery-pip span{ width:6px; height:6px; border-radius:50%; background:var(--line); }
+  .mastery-pip span.on{ background:var(--amber); }
+
+  /* ---------- Challenge cards ---------- */
+  .challenge-card{
+    background:var(--ink-3); border:1px solid var(--line); border-radius:14px;
+    padding:16px; margin-bottom:10px;
+  }
+  .challenge-top{ display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px; }
+  .challenge-ref{ font-family:var(--serif); font-size:14.5px; font-weight:600; }
+  .challenge-day{ font-size:11px; color:var(--amber); font-weight:700; background:var(--amber-soft); padding:3px 9px; border-radius:99px; }
+  .challenge-dots{ display:flex; gap:5px; }
+  .cdot{ flex:1; height:5px; border-radius:99px; background:var(--line); }
+  .cdot.done{ background:var(--amber); }
+
+  /* ---------- Family card (Grow screen summary) ---------- */
+  .family-card{ margin:0 24px 28px; background:var(--ink-3); border:1px solid var(--line); border-radius:var(--radius); padding:16px; cursor:pointer; }
+  .family-card-row{ display:flex; gap:-8px; margin-bottom:10px; }
+  .fc-avatar{
+    width:36px; height:36px; border-radius:50%; background:var(--ink-2); border:2px solid var(--ink-3);
+    display:flex; align-items:center; justify-content:center; font-size:15px; margin-left:-8px;
+  }
+  .fc-avatar:first-child{ margin-left:0; }
+  .family-card-cta{ font-size:12.5px; color:var(--amber); font-weight:600; }
+
+  /* ---------- Family screen ---------- */
+  .family-explainer{ font-size:13px; color:var(--parchment-dim); line-height:1.55; padding:0 24px 20px; }
+  .family-member-row{
+    display:flex; align-items:center; gap:14px; padding:14px 24px;
+    border-bottom:1px solid var(--line);
+  }
+  .family-member-row .m-avatar-lg{
+    width:44px; height:44px; border-radius:50%; background:var(--ink-3); border:1px solid var(--line);
+    display:flex; align-items:center; justify-content:center; font-size:19px;
+  }
+  .family-member-row .m-info{ flex:1; }
+  .family-member-row .m-name-lg{ font-family:var(--serif); font-size:15px; font-weight:600; }
+  .family-member-row .m-stats{ font-size:12px; color:var(--parchment-dim); margin-top:2px; }
+
+  /* ---------- New challenge sheet ---------- */
+  .verse-picker-row{
+    display:flex; align-items:center; justify-content:space-between; padding:12px 0;
+    border-bottom:1px solid var(--line); cursor:pointer;
+  }
+  .check-circle{
+    width:22px; height:22px; border-radius:50%; border:1.5px solid var(--line);
+    display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  }
+  .check-circle.checked{ background:var(--amber); border-color:var(--amber); color:var(--ink); }
+
+  /* ---------- Toast ---------- */
+  .toast{
+    position:fixed; bottom:110px; left:50%; transform:translateX(-50%) translateY(20px);
+    background:var(--parchment); color:var(--ink); padding:14px 22px; border-radius:14px;
+    font-size:13.5px; font-weight:600; opacity:0; transition:all .3s; z-index:200;
+    display:flex; align-items:center; gap:10px; box-shadow:0 10px 30px #00000066;
+    max-width:340px; pointer-events:none;
+  }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+
+  /* ---------- Paywall sheet ---------- */
+  .sheet-overlay{
+    position:fixed; inset:0; background:#000000aa; z-index:300; display:none;
+    align-items:flex-end; justify-content:center;
+  }
+  .sheet-overlay.show{ display:flex; }
+  .sheet{
+    background:var(--ink-2); width:100%; max-width:430px; border-radius:24px 24px 0 0;
+    padding:28px 24px calc(28px + env(safe-area-inset-bottom));
+    border:1px solid var(--line); border-bottom:none;
+    animation: slideUp .25s ease-out;
+  }
+  @keyframes slideUp{ from{ transform:translateY(100%); } to{ transform:translateY(0); } }
+  .sheet-handle{ width:36px; height:4px; background:var(--line); border-radius:99px; margin:0 auto 20px; }
+  .sheet-title{ font-family:var(--serif); font-size:19px; font-weight:600; margin-bottom:6px; text-align:center; }
+  .sheet-sub{ font-size:13px; color:var(--parchment-dim); text-align:center; margin-bottom:22px; }
+  .price-row{
+    display:flex; justify-content:space-between; align-items:center;
+    background:var(--ink-3); border:1px solid var(--line); border-radius:14px;
+    padding:16px; margin-bottom:16px;
+  }
+  .price-row .amt{ font-family:var(--serif); font-size:20px; font-weight:700; color:var(--amber); }
+  .pay-logos{ display:flex; justify-content:center; gap:10px; font-size:11px; color:var(--parchment-dim); margin-bottom:18px; }
+</style>
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ============ HOME SCREEN ============ -->
+  <div class="screen active" id="screen-home">
+    <div class="topbar">
+      <div class="wordmark">Vestule<span> Revive</span></div>
+      <div class="streak-pill" id="home-streak-pill">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c1 4-3 5-3 9a3 3 0 006 0c0-1-.5-2-1-2.5.5 2 .5 4.5-2 4.5a4 4 0 01-4-4c0-4 4-6 4-9 2 1 4 4 4 8a6 6 0 11-12 0c0-5 3-8 8-9z"/></svg>
+        <span id="streak-count-home">12</span>
+      </div>
+    </div>
+
+    <div class="scroll-area">
+      <div class="greeting" id="home-greeting">Good evening.</div>
+      <div class="greeting-sub" id="home-date">Tuesday, June 23</div>
+
+      <div class="today-card" onclick="openPlayer('healing', 0, 1)">
+        <div class="eyebrow">Today's Verse</div>
+        <div class="verse-ref">Jeremiah 17:14</div>
+        <div class="verse-text">"Heal me, O Lord, and I shall be healed; save me, and I shall be saved: for thou art my praise."</div>
+        <div class="play-row">
+          <button class="mini-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>
+          <div class="play-meta"><strong>Healing Scriptures</strong>2 min &middot; Track 1 of 6</div>
+        </div>
+      </div>
+
+      <div class="section-label">Your Packages <a onclick="goTo('packages')">See all</a></div>
+      <div class="pkg-row" id="home-pkg-row"></div>
+
+      <div class="section-label">This Week</div>
+      <div class="stat-strip">
+        <div class="stat-box"><div class="num">12</div><div class="lbl">Day streak</div></div>
+        <div class="stat-box"><div class="num">5</div><div class="lbl">This week</div></div>
+        <div class="stat-box"><div class="num">47</div><div class="lbl">Total listens</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ MY PLAYLIST SCREEN ============ -->
+  <div class="screen" id="screen-playlist">
+    <div class="topbar"><div class="wordmark">My Playlist</div><div style="width:30px"></div></div>
+    <div class="scroll-area" style="padding-top:8px">
+      <div class="section-label" style="margin-bottom:18px">
+        <span id="playlist-count">2 verses</span>
+        <a onclick="cycleLoopFromPlaylist()" id="playlist-loop-link">Loop: Off</a>
+      </div>
+      <div id="playlist-body"></div>
+
+      <div class="section-label" style="margin-top:28px">
+        <span>My Own Verses</span>
+        <a onclick="openAddOwnVerseSheet()">+ Add your own</a>
+      </div>
+      <div class="journal-explainer">A verse you heard somewhere else - at church, from a friend, anywhere. Private to you, spoken back in your phone's own voice, works fully offline. Add as many as you like - there's no limit.</div>
+      <div id="own-verses-list"></div>
+    </div>
+  </div>
+
+  <!-- ============ PACKAGES SCREEN ============ -->
+  <div class="screen" id="screen-packages">
+    <div class="topbar"><div class="wordmark">Packages</div><div style="width:30px"></div></div>
+    <div class="scroll-area">
+      <div id="allaccess-banner-slot"></div>
+      <div class="view-toggle">
+        <button id="view-btn-grouped" class="active" onclick="setPkgView('grouped')">By Family</button>
+        <button id="view-btn-flat" onclick="setPkgView('flat')">All Packages</button>
+      </div>
+      <div id="packages-body"></div>
+    </div>
+  </div>
+
+  <!-- ============ PACKAGE DETAIL SCREEN ============ -->
+  <div class="screen" id="screen-detail">
+    <div class="detail-hero">
+      <button class="back-btn" onclick="goTo('packages')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <div class="detail-icon" id="detail-icon" style="background:#3A2E22">&#127807;</div>
+      <div class="detail-title" id="detail-title">Healing Scriptures</div>
+      <div class="detail-sub" id="detail-sub">Verses drawn from across the Bible on God's promise to heal &mdash; body, mind, and spirit.</div>
+    </div>
+    <div class="scroll-area" style="padding-top:0">
+      <div class="track-list" id="detail-tracklist"></div>
+    </div>
+    <div class="cta-bar" id="detail-cta"></div>
+    <div class="cta-bar" id="detail-download-row" style="padding-top:0"></div>
+  </div>
+
+  <!-- ============ PLAYER SCREEN ============ -->
+  <div class="screen player-screen" id="screen-player">
+    <audio id="audio-element" preload="metadata"></audio>
+    <div class="player-top">
+      <button class="back-btn" style="position:static" onclick="closePlayer()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></button>
+      <div class="pkg-tag" id="player-pkg-tag">Healing Scriptures</div>
+      <div style="width:36px"></div>
+    </div>
+
+    <div class="distraction-banner">&#9679;&nbsp; Distraction-free &mdash; no notifications will interrupt this session</div>
+
+    <div class="player-center">
+      <div class="glow-wrap">
+        <div class="glow-ring" id="glow-ring"></div>
+        <button class="play-main" id="play-main-btn" onclick="togglePlay()">
+          <svg id="play-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+        </button>
+      </div>
+      <div class="verse-ref-big" id="player-verse-ref">Jeremiah 17:14</div>
+      <div class="verse-text-big" id="player-verse-text">"Heal me, O Lord, and I shall be healed; save me, and I shall be saved: for thou art my praise."</div>
+    </div>
+
+    <div class="progress-wrap">
+      <div class="progress-track" id="progress-track" onclick="seekTo(event)"><div class="progress-fill" id="progress-fill"></div></div>
+      <div class="time-row"><span id="time-current">0:38</span><span id="time-total">1:58</span></div>
+    </div>
+    <div class="player-controls">
+      <button class="ctrl-btn" onclick="skip(-1)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg></button>
+      <button class="ctrl-btn" onclick="togglePlay()" id="ctrl-play-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>
+      <button class="ctrl-btn" onclick="skip(1)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 6h2v12h-2zM6 6l8.5 6L6 18z"/></svg></button>
+      <button class="ctrl-btn loop-btn" id="loop-btn" onclick="cycleLoop()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 014-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg></button>
+    </div>
+  </div>
+
+  <!-- ============ STREAKS SCREEN ============ -->
+  <div class="screen" id="screen-streaks">
+    <div class="topbar"><div class="wordmark">Grow</div><div style="width:30px"></div></div>
+    <div class="scroll-area" style="padding-top:0">
+
+      <div class="member-switcher" id="member-switcher"></div>
+
+      <div class="section-label" style="padding:0 24px; margin-top:18px">Today's Memory Verse</div>
+      <div class="daily-verse-card" id="daily-verse-card"></div>
+
+      <div class="flame-hero">
+        <div class="flame-big">&#128293;</div>
+        <div class="flame-num" id="flame-num">12</div>
+        <div class="flame-lbl">Day Streak</div>
+      </div>
+      <div class="week-strip">
+        <div class="day-dot"><div class="dlabel">Mon</div><div class="dcircle done">&#10003;</div></div>
+        <div class="day-dot"><div class="dlabel">Tue</div><div class="dcircle today">12</div></div>
+        <div class="day-dot"><div class="dlabel">Wed</div><div class="dcircle"></div></div>
+        <div class="day-dot"><div class="dlabel">Thu</div><div class="dcircle"></div></div>
+        <div class="day-dot"><div class="dlabel">Fri</div><div class="dcircle"></div></div>
+        <div class="day-dot"><div class="dlabel">Sat</div><div class="dcircle"></div></div>
+        <div class="day-dot"><div class="dlabel">Sun</div><div class="dcircle"></div></div>
+      </div>
+
+      <div class="section-label" style="padding:0 24px">
+        <span>7-Day Challenges</span>
+        <a onclick="openNewChallengeSheet()">+ New</a>
+      </div>
+      <div id="challenge-list" style="padding:0 24px 8px"></div>
+
+      <div class="section-label" style="padding:0 24px">
+        <span>Family</span>
+        <a onclick="goTo('family')">Manage &rsaquo;</a>
+      </div>
+      <div class="family-card" onclick="goTo('family')">
+        <div class="family-card-row" id="family-progress-row"></div>
+        <div class="family-card-cta">See everyone's progress &rsaquo;</div>
+      </div>
+
+      <div class="section-label" style="padding:0 24px">Milestones</div>
+      <div class="badge-grid">
+        <div class="badge-card"><div class="badge-icon">&#127793;</div><div class="badge-name">First Step</div><div class="badge-req">Day 1 &mdash; earned</div></div>
+        <div class="badge-card"><div class="badge-icon">&#127807;</div><div class="badge-name">One Week</div><div class="badge-req">7 days &mdash; earned</div></div>
+        <div class="badge-card"><div class="badge-icon">&#9728;&#65039;</div><div class="badge-name">Steadfast</div><div class="badge-req">14 days &mdash; 2 to go</div></div>
+        <div class="badge-card locked"><div class="badge-icon">&#11088;</div><div class="badge-name">Full Moon</div><div class="badge-req">30 days</div></div>
+        <div class="badge-card locked"><div class="badge-icon">&#127801;</div><div class="badge-name">Rooted</div><div class="badge-req">90 days</div></div>
+        <div class="badge-card locked"><div class="badge-icon">&#128142;</div><div class="badge-name">A Full Year</div><div class="badge-req">365 days</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ FAMILY SCREEN ============ -->
+  <div class="screen" id="screen-family">
+    <div class="topbar">
+      <button class="back-btn" style="position:static" onclick="goTo('streaks')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <div class="wordmark">Family</div>
+      <div style="width:36px"></div>
+    </div>
+    <div class="scroll-area" style="padding-top:8px">
+      <div class="family-explainer">
+        Everyone here shares one Vestule Revive account. Add a family member to track their own streak, verses, and challenges &mdash; right alongside yours.
+      </div>
+      <div id="family-member-list"></div>
+      <button class="btn-ghost" style="margin-top:8px" onclick="addFamilyMember()">+ Add Family Member</button>
+
+      <div class="section-label" style="margin-top:28px">Parent-Child Track</div>
+      <div class="pkg-grid-item" onclick="startParentChildTrack()">
+        <div class="pkg-thumb" style="background:#3A2E22">&#128106;</div>
+        <div class="pkg-info"><div class="pkg-title">Read It Together</div><div class="pkg-desc">A short verse each day, made for a parent and child to read side by side</div></div>
+        <div class="pkg-price trial">Start</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ SETTINGS / REMINDER SCREEN ============ -->
+  <div class="screen" id="screen-settings">
+    <div class="topbar"><div class="wordmark">Settings</div><div style="width:30px"></div></div>
+
+    <div class="scroll-area" style="padding-top:0">
+      <div class="section-label">Daily Reminder</div>
+      <div class="setting-row">
+        <div><div class="setting-label">Remind me to listen</div><div class="setting-sub">A gentle nudge, once a day</div></div>
+        <div class="toggle on" id="toggle-reminder" onclick="toggleSwitch(this)"><div class="knob"></div></div>
+      </div>
+      <div class="time-picker">&#128340;&nbsp; 7:00 PM daily</div>
+
+      <div class="section-label" style="margin-top:28px">Listening</div>
+      <div class="setting-row">
+        <div><div class="setting-label">Show verse text while playing</div><div class="setting-sub">Turn off for audio-only, eyes-closed listening</div></div>
+        <div class="toggle on" onclick="toggleSwitch(this)"><div class="knob"></div></div>
+      </div>
+
+      <div class="section-label" style="margin-top:28px">Downloads</div>
+      <div id="settings-download-summary"></div>
+      <div class="download-explainer">Each package downloads separately so you only use data for what you actually want offline. Healing downloaded automatically since it's free for everyone.</div>
+
+      <div class="section-label" style="margin-top:28px">Account</div>
+      <div class="setting-row"><div class="setting-label">Restore purchases</div></div>
+      <div class="setting-row"><div class="setting-label">Payment method &middot; Paystack</div></div>
+      <div class="setting-row"><div class="setting-label">Contact support</div></div>
+    </div>
+  </div>
+
+  <!-- ============ BOTTOM NAV ============ -->
+  <div class="bottomnav" id="bottomnav">
+    <button class="navbtn active" onclick="goTo('home')" data-nav="home">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-8 9 8M5 10v10h14V10"/></svg>
+      Home
+    </button>
+    <button class="navbtn" onclick="goTo('packages')" data-nav="packages">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5V5a2 2 0 012-2h12a2 2 0 012 2v14.5M6 6h9M6 10h9"/></svg>
+      Packages
+    </button>
+    <button class="navbtn" onclick="goTo('playlist')" data-nav="playlist">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+      Mine
+    </button>
+    <button class="navbtn" onclick="goTo('streaks')" data-nav="streaks">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2c1 4-3 5-3 9a3 3 0 006 0c0-4-3-5-3-9z"/></svg>
+      Grow
+    </button>
+    <button class="navbtn" onclick="goTo('settings')" data-nav="settings">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 11-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 110-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 114 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 110 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      Settings
+    </button>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <!-- ============ PAYWALL SHEET ============ -->
+  <div class="sheet-overlay" id="paywall-overlay" onclick="if(event.target===this) closeSheet()">
+    <div class="sheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-title" id="sheet-title">Unlock Faith &amp; Trust</div>
+      <div class="sheet-sub" id="sheet-sub-text">All packages &middot; Yours to keep, offline, forever</div>
+      <div class="price-row"><span>One-time purchase</span><span class="amt" id="sheet-price">&#8358;1,500</span></div>
+      <div class="pay-logos">Pay securely with Paystack &middot; Card, Bank Transfer, USSD</div>
+      <button class="btn-primary" id="pay-btn" onclick="handlePurchase()">Pay with Paystack</button>
+    </div>
+  </div>
+
+  <!-- ============ ADD YOUR OWN VERSE SHEET ============ -->
+  <div class="sheet-overlay" id="ownverse-overlay" onclick="if(event.target===this) closeOwnVerseSheet()">
+    <div class="sheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-title">Add Your Own Verse</div>
+      <div class="sheet-sub">Private to you &middot; spoken in your phone's own voice &middot; works offline</div>
+
+      <div class="sheet-input-label">Reference (optional)</div>
+      <input class="sheet-input" id="ov-ref-input" placeholder="e.g. Psalm 91:1" maxlength="40">
+
+      <div class="sheet-input-label">Verse text</div>
+      <textarea class="sheet-input" id="ov-text-input" placeholder="Type the verse as you heard it..." maxlength="500"></textarea>
+
+      <button class="btn-primary" style="margin-top:18px" onclick="saveOwnVerse()">Save to My Own Verses</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function hasAccess(pkg){
+  return pkg.free || allAccessUnlocked || (pkg.trialDaysLeft && pkg.trialDaysLeft > 0);
+}
+
+function accessLabel(pkg){
+  if(pkg.free) return 'Free';
+  if(allAccessUnlocked) return 'Unlocked';
+  if(pkg.trialDaysLeft > 0) return pkg.trialDaysLeft + ' day' + (pkg.trialDaysLeft===1?'':'s') + ' left in trial';
+  return 'Part of All Access';
+}
+
+let pkgView = 'grouped';
+let activeChip = 'all';
+
+function setPkgView(view){
+  pkgView = view;
+  document.getElementById('view-btn-grouped').classList.toggle('active', view==='grouped');
+  document.getElementById('view-btn-flat').classList.toggle('active', view==='flat');
+  renderPackagesScreen();
+}
+
+function pkgCardHTML(key, pkg){
+  const label = accessLabel(pkg);
+  const labelClass = (pkg.free || allAccessUnlocked) ? 'owned' : (pkg.trialDaysLeft>0 ? 'trial' : '');
+  return `<div class="pkg-grid-item" onclick="openPackage('${key}')">
+    <div class="pkg-thumb" style="background:${pkg.color}">${pkg.icon}</div>
+    <div class="pkg-info"><div class="pkg-title">${pkg.name}</div><div class="pkg-desc">${pkg.desc}</div></div>
+    <div class="pkg-price ${labelClass}">${label}</div>
+  </div>`;
+}
+
+function renderAllAccessBanner(){
+  const slot = document.getElementById('allaccess-banner-slot');
+  if(!slot) return;
+  if(allAccessUnlocked){
+    slot.innerHTML = `<div class="allaccess-banner unlocked">
+      <div class="aa-text"><div class="aa-title">&#10003; All Access unlocked</div><div class="aa-sub">Every package, yours to keep, offline, forever</div></div>
+      <div class="aa-price">Active</div>
+    </div>`;
+  } else {
+    slot.innerHTML = `<div class="allaccess-banner" onclick="showPaywall('faith')">
+      <div class="aa-text"><div class="aa-title">Unlock Everything</div><div class="aa-sub">Every package &middot; one payment &middot; forever</div></div>
+      <div class="aa-price">${ALL_ACCESS_PRICE}</div>
+    </div>`;
+  }
+}
+
+function renderPackagesScreen(){
+  renderAllAccessBanner();
+  const body = document.getElementById('packages-body');
+
+  if(pkgView === 'grouped'){
+    const order = ['everyone','mothers','fathers','children','teens','couples'];
+    body.innerHTML = order.map(cat=>{
+      const items = Object.entries(packages).filter(([k,p])=>p.category===cat);
+      if(items.length===0) return '';
+      const meta = categoryMeta[cat];
+      return `<div class="cat-section">
+        <div class="cat-header"><span class="cat-icon">${meta.icon}</span><span class="cat-title">${meta.label}</span></div>
+        ${items.map(([k,p])=>pkgCardHTML(k,p)).join('')}
+      </div>`;
+    }).join('');
+  } else {
+    const chips = ['all',...Object.keys(categoryMeta)];
+    const chipBar = `<div class="filter-chips">
+      ${chips.map(c=>`<button class="chip ${activeChip===c?'active':''}" onclick="setChip('${c}')">${c==='all'?'All':categoryMeta[c].label}</button>`).join('')}
+    </div>`;
+    const items = Object.entries(packages).filter(([k,p])=> activeChip==='all' || p.category===activeChip);
+    body.innerHTML = chipBar + items.map(([k,p])=>pkgCardHTML(k,p)).join('');
+  }
+}
+
+function setChip(c){ activeChip = c; renderPackagesScreen(); }
+
+// ===================================================================
+// PAYSTACK CONFIG
+// Fill in PUBLIC_KEY and BACKEND_URL to go live. Leave PUBLIC_KEY blank
+// to keep this prototype running in mock mode (no real charges).
+// The secret key NEVER goes here - it lives only in your backend's
+// environment variables. See /api/paystack-initialize.js and
+// /api/paystack-verify.js for the backend half of this flow.
+// ===================================================================
+const PAYSTACK_PUBLIC_KEY = ''; // e.g. 'pk_test_xxxxxxxxxxxxxxxxxxxxxxxx'
+const BACKEND_URL = '';         // e.g. 'https://yourapp.com/api'
+const CURRENT_USER_EMAIL = 'demo@example.com'; // replace with real logged-in user email
+const CURRENT_USER_ID = 'demo-user-1';         // replace with real logged-in user id
+
+let currentPkg = 'healing';
+let isPlaying = false;
+let playTimer = null;
+let pendingPkg = null;
+
+// One payment unlocks every paid package, forever. Healing stays free regardless.
+const ALL_ACCESS_PRICE = '&#8358;2,500';
+let allAccessUnlocked = false;
+
+// ===================================================================
+// OFFLINE DOWNLOADS
+// Per-package, not global - someone only spends data on what they
+// actually want offline. Status per package: 'none' | 'downloading' | 'done'.
+// In this prototype there is no real audio yet, so "downloading" is
+// simulated with a progress timer - but the states and UI are the real
+// ones a future service-worker-backed implementation would use to cache
+// actual MP3 files (see Settings > Listening > offline downloads).
+// Healing auto-downloads on first load since it's the free anchor
+// package - every new user gets one fully offline-ready package with
+// zero taps required.
+// ===================================================================
+let downloadStatus = {
+  healing: 'none', // becomes 'downloading' then 'done' via startDownload() call below on app load
+};
+
+function getDownloadStatus(pkgKey){
+  return downloadStatus[pkgKey] || 'none';
+}
+
+function startDownload(pkgKey){
+  if(downloadStatus[pkgKey] === 'downloading' || downloadStatus[pkgKey] === 'done') return;
+  downloadStatus[pkgKey] = 'downloading';
+  let pct = 0;
+  const timer = setInterval(()=>{
+    pct += 14;
+    updateDownloadProgressUI(pkgKey, Math.min(pct,100));
+    if(pct >= 100){
+      clearInterval(timer);
+      downloadStatus[pkgKey] = 'done';
+      saveState();
+      renderSettingsDownloadSummary();
+      renderDownloadButtonInDetail(pkgKey);
+      showToast('&#10003; '+packages[pkgKey].name+' ready offline');
+    }
+  }, 280);
+  renderSettingsDownloadSummary();
+  renderDownloadButtonInDetail(pkgKey);
+}
+
+function removeDownload(pkgKey){
+  downloadStatus[pkgKey] = 'none';
+  saveState();
+  renderSettingsDownloadSummary();
+  renderDownloadButtonInDetail(pkgKey);
+  showToast(packages[pkgKey].name+' removed from this device');
+}
+
+function updateDownloadProgressUI(pkgKey, pct){
+  const bar = document.getElementById('dl-progress-'+pkgKey);
+  if(bar) bar.style.width = pct+'%';
+}
+
+function renderSettingsDownloadSummary(){
+  const el = document.getElementById('settings-download-summary');
+  if(!el) return;
+  const keys = Object.keys(packages).filter(k => hasAccess(packages[k]));
+  el.innerHTML = keys.map(k=>{
+    const pkg = packages[k];
+    const status = getDownloadStatus(k);
+    let actionHTML;
+    if(status === 'done'){
+      actionHTML = `<div class="dl-action downloaded" onclick="removeDownload('${k}')">&#10003; Downloaded</div>`;
+    } else if(status === 'downloading'){
+      actionHTML = `<div class="dl-action downloading">Downloading&hellip;</div>`;
+    } else {
+      actionHTML = `<div class="dl-action not-downloaded" onclick="startDownload('${k}')">Download</div>`;
+    }
+    return `<div class="download-row">
+      <div class="dl-info">
+        <div class="dl-name">${pkg.name}</div>
+        <div class="dl-size">${pkg.tracks.length} tracks &middot; ~${(pkg.tracks.length*2.4).toFixed(0)}MB</div>
+        ${status==='downloading' ? `<div class="dl-progress-track"><div class="dl-progress-fill" id="dl-progress-${k}" style="width:0%"></div></div>` : ''}
+      </div>
+      ${actionHTML}
+    </div>`;
+  }).join('');
+}
+
+function renderDownloadButtonInDetail(pkgKey){
+  const el = document.getElementById('detail-download-row');
+  if(!el || currentPkg !== pkgKey) return;
+  const status = getDownloadStatus(pkgKey);
+  if(status === 'done'){
+    el.innerHTML = `<div class="dl-action downloaded" onclick="removeDownload('${pkgKey}')" style="width:100%; text-align:center; padding:11px;">&#10003; Downloaded &middot; available offline</div>`;
+  } else if(status === 'downloading'){
+    el.innerHTML = `<div style="width:100%"><div class="dl-action downloading" style="width:100%; text-align:center; padding:11px; box-sizing:border-box;">Downloading for offline&hellip;</div><div class="dl-progress-track"><div class="dl-progress-fill" id="dl-progress-${pkgKey}" style="width:0%"></div></div></div>`;
+  } else {
+    el.innerHTML = `<div class="dl-action not-downloaded" onclick="startDownload('${pkgKey}')" style="width:100%; text-align:center; padding:11px;">&#11015; Download for offline</div>`;
+  }
+}
+
+// Each package now carries: category (who it's for), and trial state.
+// Healing is the permanent free anchor - never locks.
+// Others get a 7-day full trial from first open, then lock until purchased.
+const packages = {
+  healing: { name:'Healing Scriptures', icon:'&#127807;', color:'#3A2E22', owned:true, free:true, category:'everyone',
+    desc:"Verses drawn from across the Bible on God's promise to heal &mdash; body, mind, and spirit.",
+    tracks:[
+      { title:"God's Promise to Heal", dur:'2:46',
+        verses:[
+          {ref:'Exodus 15:26', text:'I am the Lord that healeth thee.', audioFile:'audio/healing_t1_v1.mp3'},
+          {ref:'Jeremiah 17:14', text:'Heal me, O Lord, and I shall be healed; save me, and I shall be saved: for thou art my praise.', audioFile:'audio/healing_t1_v2.mp3'},
+          {ref:'Psalm 107:20', text:'He sent his word, and healed them, and delivered them from their destructions.', audioFile:'audio/healing_t1_v3.mp3'},
+          {ref:'Jeremiah 30:17', text:'For I will restore health unto thee, and I will heal thee of thy wounds, saith the Lord.', audioFile:'audio/healing_t1_v4.mp3'},
+        ]},
+      { title:'Healing Through the Cross', dur:'2:20', durSec:140,
+        verses:[
+          {ref:'Isaiah 53:4&ndash;5', text:'Surely he hath borne our griefs, and carried our sorrows... and with his stripes we are healed.', start:0, end:48},
+          {ref:'1 Peter 2:24', text:'Who his own self bare our sins in his own body on the tree, that we, being dead to sins, should live unto righteousness: by whose stripes ye were healed.', start:48, end:84},
+          {ref:'Matthew 8:16&ndash;17', text:'Himself took our infirmities, and bare our sicknesses.', start:84, end:140},
+        ]},
+      { title:'Healing Through Faith', dur:'2:58', durSec:178,
+        verses:[
+          {ref:'Mark 11:24', text:'What things soever ye desire, when ye pray, believe that ye receive them, and ye shall have them.', start:0, end:38},
+          {ref:'Matthew 9:22', text:'But Jesus turned him about, and when he saw her, he said, Daughter, be of good comfort; thy faith hath made thee whole.', start:38, end:80},
+          {ref:'Mark 5:34', text:'And he said unto her, Daughter, thy faith hath made thee whole; go in peace, and be whole of thy plague.', start:80, end:112},
+          {ref:'James 5:14&ndash;15', text:'And the prayer of faith shall save the sick, and the Lord shall raise him up.', start:112, end:178},
+        ]},
+      { title:'Strength and Restoration', dur:'2:30', durSec:150,
+        verses:[
+          {ref:'Psalm 30:2', text:'O Lord my God, I cried unto thee, and thou hast healed me.', start:0, end:24},
+          {ref:'Psalm 41:3', text:'The Lord will strengthen him upon the bed of languishing: thou wilt make all his bed in his sickness.', start:24, end:60},
+          {ref:'Isaiah 40:29,31', text:'He giveth power to the faint... they shall mount up with wings as eagles; they shall run, and not be weary.', start:60, end:150},
+        ]},
+      { title:'Peace for the Mind', dur:'2:12', durSec:132,
+        verses:[
+          {ref:'Philippians 4:6&ndash;7', text:'Be careful for nothing; but in every thing by prayer and supplication with thanksgiving let your requests be made known unto God. And the peace of God... shall keep your hearts and minds through Christ Jesus.', start:0, end:50},
+          {ref:'Isaiah 26:3', text:'Thou wilt keep him in perfect peace, whose mind is stayed on thee: because he trusteth in thee.', start:50, end:84},
+          {ref:'3 John 1:2', text:'Beloved, I wish above all things that thou mayest prosper and be in health, even as thy soul prospereth.', start:84, end:132},
+        ]},
+      { title:'Declarations of Faith', dur:'1:58', durSec:118,
+        verses:[
+          {ref:'Psalm 118:17', text:'I shall not die, but live, and declare the works of the Lord.', start:0, end:22},
+          {ref:'Isaiah 41:10', text:'Fear thou not; for I am with thee: be not dismayed; for I am thy God: I will strengthen thee.', start:22, end:60},
+          {ref:'Romans 8:11', text:'He that raised up Christ from the dead shall also quicken your mortal bodies by his Spirit that dwelleth in you.', start:60, end:118},
+        ]},
+    ]},
+  faith: { name:'Faith &amp; Trust', icon:'&#10024;', color:'#2A3326', owned:false, free:false, price:'&#8358;1,500', category:'everyone',
+    trialDaysLeft:5,
+    desc:'Scriptures for seasons of waiting, uncertainty, and trust.',
+    tracks:[
+      { title:'The Substance of Faith', dur:'2:10', durSec:130,
+        verses:[
+          {ref:'Hebrews 11:1', text:'Now faith is the substance of things hoped for, the evidence of things not seen.', start:0, end:40},
+          {ref:'Romans 10:17', text:'So then faith cometh by hearing, and hearing by the word of God.', start:40, end:78},
+          {ref:'2 Corinthians 5:7', text:'For we walk by faith, not by sight.', start:78, end:130},
+        ]},
+      { title:'Trusting Beyond Sight', dur:'2:00', durSec:120,
+        verses:[
+          {ref:'Proverbs 3:5&ndash;6', text:'Trust in the Lord with all thine heart, and lean not unto thine own understanding.', start:0, end:60},
+          {ref:'Isaiah 41:10', text:'Fear thou not; for I am with thee.', start:60, end:120},
+        ]},
+    ]},
+  peace: { name:'Peace &amp; Rest', icon:'&#127769;', color:'#2E2A22', owned:false, free:false, price:'&#8358;1,500', category:'everyone',
+    trialDaysLeft:0,
+    desc:'For anxious nights and restless minds.',
+    tracks:[
+      { title:'Be Careful for Nothing', dur:'2:05', durSec:125,
+        verses:[{ref:'Philippians 4:6&ndash;7', text:'Be careful for nothing; but in every thing by prayer and supplication, with thanksgiving, let your requests be made known unto God.', start:0, end:125}]},
+    ]},
+  mothers: { name:'For Mothers', icon:'&#127804;', color:'#332430', owned:false, free:false, price:'&#8358;1,500', category:'mothers',
+    trialDaysLeft:5,
+    desc:'Strength and peace for the work of raising children.',
+    tracks:[
+      { title:'Strength for the Journey', dur:'1:50', durSec:110,
+        verses:[
+          {ref:'Proverbs 31:25', text:'Strength and honour are her clothing; and she shall rejoice in time to come.', start:0, end:30},
+          {ref:'Isaiah 40:11', text:'He shall feed his flock like a shepherd... he shall gently lead those that are with young.', start:30, end:110},
+        ]},
+    ]},
+  fathers: { name:'For Fathers', icon:'&#127960;', color:'#2A2E33', owned:false, free:false, price:'&#8358;1,500', category:'fathers',
+    trialDaysLeft:7,
+    desc:'Wisdom and provision for leading a home.',
+    tracks:[
+      { title:'Leading with Wisdom', dur:'1:40', durSec:100,
+        verses:[
+          {ref:'Joshua 1:9', text:'Have not I commanded thee? Be strong and of a good courage; be not afraid, neither be thou dismayed.', start:0, end:50},
+          {ref:'Proverbs 22:6', text:'Train up a child in the way he should go: and when he is old, he will not depart from it.', start:50, end:100},
+        ]},
+    ]},
+  children: { name:'Children &amp; Teens', icon:'&#127775;', color:'#22303A', owned:false, free:false, price:'&#8358;1,200', category:'children',
+    trialDaysLeft:5,
+    desc:'Gentle, simple verses for younger listeners.',
+    tracks:[
+      { title:'My Shepherd', dur:'1:30', durSec:90,
+        verses:[{ref:'Psalm 23:1', text:'The Lord is my shepherd; I shall not want.', start:0, end:90}]},
+    ]},
+  teens: { name:'For Teens', icon:'&#127919;', color:'#332A22', owned:false, free:false, price:'&#8358;1,200', category:'teens',
+    trialDaysLeft:3,
+    desc:'Standing firm in identity, purpose, and peer pressure.',
+    tracks:[
+      { title:'Finding Your Purpose', dur:'1:55', durSec:115,
+        verses:[
+          {ref:'Jeremiah 29:11', text:'For I know the thoughts that I think toward you, saith the Lord, thoughts of peace, and not of evil, to give you an expected end.', start:0, end:60},
+          {ref:'1 Timothy 4:12', text:'Let no man despise thy youth; but be thou an example.', start:60, end:115},
+        ]},
+    ]},
+  couples: { name:'For Couples', icon:'&#128141;', color:'#2E2436', owned:false, free:false, price:'&#8358;1,800', category:'couples',
+    trialDaysLeft:0,
+    desc:'Building a home rooted in covenant and grace.',
+    tracks:[
+      { title:'A House Built Right', dur:'1:45', durSec:105,
+        verses:[
+          {ref:'Ecclesiastes 4:9&ndash;10', text:'Two are better than one; because they have a good reward for their labour.', start:0, end:50},
+          {ref:'1 Corinthians 13:4&ndash;7', text:'Charity suffereth long, and is kind... beareth all things, believeth all things, hopeth all things, endureth all things.', start:50, end:105},
+        ]},
+    ]},
+};
+
+const categoryMeta = {
+  everyone: { label:'For Everyone', icon:'&#127968;' },
+  mothers: { label:'For Mothers', icon:'&#127804;' },
+  fathers: { label:'For Fathers', icon:'&#127960;' },
+  children: { label:'For Children', icon:'&#127775;' },
+  teens: { label:'For Teens', icon:'&#127919;' },
+  couples: { label:'For Couples', icon:'&#128141;' },
+};
+
+// User's custom playlist: array of {pkg, trackIdx, verseIdx}
+// Personal verse journal: verses the user typed in themselves, e.g. heard
+// at church. Private to this device only - never shared with other users
+// or uploaded anywhere. Spoken back using the phone's own built-in text-
+// to-speech voice (Web Speech API's SpeechSynthesis), which works fully
+// offline and costs nothing - unlike a cloud voice service, which would
+// need an internet connection just for this one feature and break the
+// "works offline" promise the rest of the app keeps.
+let ownVerses = [];
+
+let myPlaylist = [
+  {pkg:'healing', trackIdx:0, verseIdx:1},
+  {pkg:'healing', trackIdx:2, verseIdx:0},
+];
+
+let loopMode = 'off'; // 'off' | 'verse' | 'track' | 'playlist'
+
+// ===================================================================
+// HOUSEHOLD / MEMBER MODEL
+// Designed so a single-login "family mode" today can become real
+// multi-account family tracking later without a data rewrite.
+// Right now there is exactly one real login ("me"), but every piece
+// of progress is stored keyed by memberId, not globally - so adding
+// real per-person logins later is just adding more members + auth,
+// not restructuring this data.
+// ===================================================================
+let currentMemberId = 'me';
+
+let household = {
+  members: {
+    me: { id:'me', name:'Me', isPrimary:true, avatar:'&#128100;' },
+    // Family-mode members are manually added under the one login -
+    // no separate password/account yet. Real accounts (Option A)
+    // would replace this with actual auth per member.
+    child1: { id:'child1', name:'Junior', isPrimary:false, avatar:'&#128118;' },
+  },
+  memberOrder: ['me', 'child1'],
+};
+
+// Per-member progress, keyed by memberId. This is the part that
+// makes the future multi-account upgrade painless: each member
+// already has independent streaks, verse mastery, and challenge
+// progress, even though only one of them has a real login today.
+let memberProgress = {
+  me: {
+    streak: 12,
+    totalListens: 47,
+    verseMastery: {}, // key: "pkg:trackIdx:verseIdx" -> {status: 'new'|'learning'|'mastered', lastReviewed, timesReviewed}
+    activeChallenges: [], // 7-day challenge instances
+  },
+  child1: {
+    streak: 3,
+    totalListens: 6,
+    verseMastery: {},
+    activeChallenges: [],
+  },
+};
+
+// Daily memory verse: personalized per the member's most recently
+// used / favorited package, falling back to the free Healing package.
+function getDailyVerseForMember(memberId){
+  const recent = myPlaylist.length > 0 ? myPlaylist[myPlaylist.length-1] : {pkg:'healing', trackIdx:0, verseIdx:1};
+  const pkg = packages[recent.pkg];
+  const verse = pkg.tracks[recent.trackIdx].verses[recent.verseIdx];
+  return { pkgKey: recent.pkg, trackIdx: recent.trackIdx, verseIdx: recent.verseIdx, verse, pkgName: pkg.name };
+}
+
+function verseKey(pkgKey, trackIdx, verseIdx){
+  return pkgKey+':'+trackIdx+':'+verseIdx;
+}
+
+function getMastery(memberId, pkgKey, trackIdx, verseIdx){
+  const m = memberProgress[memberId].verseMastery[verseKey(pkgKey,trackIdx,verseIdx)];
+  return m ? m.status : 'new';
+}
+
+function advanceMastery(memberId, pkgKey, trackIdx, verseIdx){
+  const key = verseKey(pkgKey,trackIdx,verseIdx);
+  const prog = memberProgress[memberId];
+  const existing = prog.verseMastery[key] || {status:'new', timesReviewed:0};
+  const order = ['new','learning','familiar','mastered'];
+  const nextIdx = Math.min(order.indexOf(existing.status)+1, order.length-1);
+  prog.verseMastery[key] = {
+    status: order[nextIdx],
+    timesReviewed: existing.timesReviewed+1,
+    lastReviewed: new Date().toISOString(),
+  };
+}
+
+// 7-day memorization challenge - a structured program around ONE verse,
+// repeated/drilled daily for a week. Can be assigned to a single member
+// or, in family-mode, to multiple members at once (shared challenge,
+// independent per-member completion - this is the part that maps
+// directly onto real "family challenges" once real accounts exist).
+function startChallenge(memberIds, pkgKey, trackIdx, verseIdx){
+  const challenge = {
+    id: 'ch_'+Date.now(),
+    pkgKey, trackIdx, verseIdx,
+    startDate: new Date().toISOString(),
+    daysCompleted: [], // array of day numbers 1-7 completed
+    memberIds, // who's doing this together
+  };
+  memberIds.forEach(mid=>{
+    memberProgress[mid].activeChallenges.push({...challenge});
+  });
+  return challenge;
+}
+
+function goTo(screen){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+screen).classList.add('active');
+  document.querySelectorAll('.navbtn').forEach(b=>b.classList.remove('active'));
+  const navBtn = document.querySelector('[data-nav="'+screen+'"]');
+  if(navBtn) navBtn.classList.add('active');
+  document.getElementById('bottomnav').style.display =
+    ['home','packages','playlist','streaks','settings'].includes(screen) ? 'flex' : 'none';
+  window.scrollTo(0,0);
+  if(screen === 'playlist') renderPlaylist();
+  if(screen === 'packages') renderPackagesScreen();
+  if(screen === 'streaks'){
+    renderMemberSwitcher(); renderDailyVerseCard(); renderChallengeList(); renderFamilyProgressRow();
+    document.getElementById('flame-num').textContent = memberProgress[currentMemberId].streak;
+  }
+  if(screen === 'family') renderFamilyScreen();
+  if(screen === 'settings') renderSettingsDownloadSummary();
+}
+
+function openPackage(key){
+  const pkg = packages[key];
+  currentPkg = key;
+  document.getElementById('detail-icon').innerHTML = pkg.icon;
+  document.getElementById('detail-icon').style.background = pkg.color;
+  document.getElementById('detail-title').innerHTML = pkg.name;
+  document.getElementById('detail-sub').innerHTML = pkg.desc;
+
+  const list = document.getElementById('detail-tracklist');
+  list.innerHTML = pkg.tracks.map((t,ti)=>`
+    <div class="track-cluster">
+      <div class="track-item ${!hasAccess(pkg) ? 'locked':''}" onclick="${hasAccess(pkg) ? `openPlayer('${key}',${ti},0)` : `showPaywall('${key}')`}">
+        <div class="track-num">${ti+1}</div>
+        <div class="track-name">${t.title}<div class="track-versecount">${t.verses.length} verses</div></div>
+        <div class="track-dur">${t.dur}</div>
+      </div>
+      <div class="verse-sublist">
+        ${t.verses.map((v,vi)=>`
+          <div class="verse-subrow">
+            <span class="verse-subref" onclick="${hasAccess(pkg) ? `openPlayer('${key}',${ti},${vi})` : `showPaywall('${key}')`}">${v.ref}</span>
+            <button class="add-btn ${isInPlaylist(key,ti,vi)?'added':''}" onclick="event.stopPropagation(); toggleAddPlaylist('${key}',${ti},${vi}, this)">
+              ${isInPlaylist(key,ti,vi) ? '&#10003; Added' : '+ My Playlist'}
+            </button>
+          </div>`).join('')}
+      </div>
+    </div>`).join('');
+
+  const cta = document.getElementById('detail-cta');
+  const downloadRow = document.getElementById('detail-download-row');
+  if(hasAccess(pkg)){
+    const trialNote = (!pkg.free && !allAccessUnlocked && pkg.trialDaysLeft > 0)
+      ? `<div class="trial-note">&#8987; ${pkg.trialDaysLeft} day${pkg.trialDaysLeft===1?'':'s'} left in your free trial &middot; Get All Access for ${ALL_ACCESS_PRICE} to keep it</div>`
+      : '';
+    cta.innerHTML = trialNote + `<button class="btn-primary" onclick="openPlayer('${key}',0,0)">Play All</button>`;
+    renderDownloadButtonInDetail(key);
+  } else {
+    cta.innerHTML = `<button class="btn-primary" onclick="showPaywall('${key}')">Unlock All Access &mdash; ${ALL_ACCESS_PRICE}</button>`;
+    downloadRow.innerHTML = ''; // no download option for content you don't have access to yet
+  }
+
+  goTo('detail');
+}
+
+function isInPlaylist(pkg, trackIdx, verseIdx){
+  return myPlaylist.some(p=>p.pkg===pkg && p.trackIdx===trackIdx && p.verseIdx===verseIdx);
+}
+
+function toggleAddPlaylist(pkg, trackIdx, verseIdx, btn){
+  const idx = myPlaylist.findIndex(p=>p.pkg===pkg && p.trackIdx===trackIdx && p.verseIdx===verseIdx);
+  if(idx>-1){
+    myPlaylist.splice(idx,1);
+    btn.classList.remove('added');
+    btn.innerHTML = '+ My Playlist';
+    showToast('Removed from My Playlist');
+  } else {
+    myPlaylist.push({pkg,trackIdx,verseIdx});
+    btn.classList.add('added');
+    btn.innerHTML = '&#10003; Added';
+    const v = packages[pkg].tracks[trackIdx].verses[verseIdx];
+    showToast('&#10003; '+v.ref+' added to My Playlist');
+  }
+  if(document.getElementById('screen-playlist').classList.contains('active')) renderPlaylist();
+  saveState();
+}
+
+let curTrackIdx = 0, curVerseIdx = 0, curPct = 0;
+let playSource = null; // {type:'package', key} or {type:'playlist'}
+let playlistPos = 0;
+
+function openPlayer(key, trackIdx, verseIdx){
+  playSource = {type:'package', key};
+  currentPkg = key;
+  curTrackIdx = trackIdx; curVerseIdx = verseIdx;
+  loadPlayerTrack();
+  goTo('player');
+  if(!isPlaying) togglePlay();
+}
+
+function openPlaylistPlayer(pos){
+  playSource = {type:'playlist'};
+  playlistPos = pos;
+  const item = myPlaylist[pos];
+  currentPkg = item.pkg; curTrackIdx = item.trackIdx; curVerseIdx = item.verseIdx;
+  loadPlayerTrack();
+  goTo('player');
+  if(!isPlaying) togglePlay();
+}
+
+function loadPlayerTrack(){
+  const pkg = packages[currentPkg];
+  const track = pkg.tracks[curTrackIdx];
+  const verse = track.verses[curVerseIdx];
+  document.getElementById('player-pkg-tag').innerHTML = pkg.name + ' &middot; ' + track.title;
+  document.getElementById('player-verse-ref').innerHTML = verse.ref;
+  document.getElementById('player-verse-text').innerHTML = verse.text;
+  document.getElementById('time-total').textContent = '0:00'; // updated once the real file's duration loads
+  document.getElementById('time-current').textContent = '0:00';
+  document.getElementById('progress-fill').style.width = '0%';
+  curPct = 0;
+  updateLoopButtonUI();
+
+  const audio = document.getElementById('audio-element');
+  audio.pause();
+
+  if(verse.audioFile){
+    // Each verse is now its own complete, separate audio file - no
+    // internal timestamps to seek to or get wrong. The file simply
+    // starts at 0 and ends when it ends.
+    audio.src = verse.audioFile;
+    audio.dataset.hasRealAudio = 'true';
+  } else {
+    // No real recording yet for this verse - fall back to the simulated
+    // progress timer so the rest of the app still demos correctly while
+    // content is still being produced and uploaded.
+    audio.removeAttribute('src');
+    audio.dataset.hasRealAudio = 'false';
+    document.getElementById('time-total').textContent = formatTime(SIMULATED_VERSE_SECONDS);
+  }
+}
+
+const SIMULATED_VERSE_SECONDS = 20; // only used for verses with no real audio file yet
+
+document.getElementById('audio-element').addEventListener('loadedmetadata', function(){
+  if(this.dataset.hasRealAudio === 'true' && isFinite(this.duration)){
+    document.getElementById('time-total').textContent = formatTime(this.duration);
+  }
+});
+
+function seekTo(evt){
+  const track = document.getElementById('progress-track');
+  const rect = track.getBoundingClientRect();
+  const clientX = evt.touches ? evt.touches[0].clientX : evt.clientX;
+  const pct = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+
+  const audio = document.getElementById('audio-element');
+  if(audio.dataset.hasRealAudio === 'true' && isFinite(audio.duration)){
+    audio.currentTime = pct * audio.duration;
+    document.getElementById('progress-fill').style.width = (pct*100)+'%';
+    document.getElementById('time-current').textContent = formatTime(audio.currentTime);
+  } else {
+    curPct = pct*100;
+    document.getElementById('progress-fill').style.width = (pct*100)+'%';
+    document.getElementById('time-current').textContent = formatTime(pct*SIMULATED_VERSE_SECONDS);
+  }
+}
+
+function formatTime(sec){
+  const m = Math.floor(sec/60), s = Math.round(sec%60);
+  return m+':'+String(s).padStart(2,'0');
+}
+
+function closePlayer(){
+  clearInterval(playTimer);
+  document.getElementById('audio-element').pause();
+  isPlaying = false;
+  if(playSource && playSource.type==='playlist') goTo('playlist');
+  else goTo(hasAccess(packages[currentPkg]) ? 'detail' : 'home');
+}
+
+// ===================================================================
+// INTERRUPTION HANDLING
+// "No distractions" describes what THIS APP shows/plays - it never means
+// blocking phone calls, notifications, or other apps. When the person
+// switches away (a call comes in, they check another app, the screen
+// locks), playback pauses automatically and picks back up exactly where
+// they left off when they return - the same behavior as Spotify or
+// Apple Podcasts. We never fight the phone's normal behavior.
+// ===================================================================
+let wasPlayingBeforeInterruption = false;
+
+document.addEventListener('visibilitychange', () => {
+  if(document.hidden){
+    // App lost focus (call, app switch, screen lock) - pause if playing.
+    if(isPlaying){
+      wasPlayingBeforeInterruption = true;
+      togglePlay(); // pauses, since isPlaying is currently true
+    }
+  } else {
+    // App regained focus - resume only if we paused it for this reason
+    // (not if the person had already paused it themselves on purpose).
+    if(wasPlayingBeforeInterruption){
+      wasPlayingBeforeInterruption = false;
+      if(!isPlaying) togglePlay(); // resumes from the exact saved progress
+      showToast('Resumed where you left off');
+    }
+  }
+});
+
+function togglePlay(){
+  isPlaying = !isPlaying;
+  const icon = isPlaying
+    ? '<path d="M6 5h4v14H6zm8 0h4v14h-4z"/>'
+    : '<path d="M8 5v14l11-7z"/>';
+  document.getElementById('play-icon').innerHTML = icon;
+  document.getElementById('glow-ring').classList.toggle('breathing', isPlaying);
+
+  const audio = document.getElementById('audio-element');
+  const usingRealAudio = audio.dataset.hasRealAudio === 'true';
+
+  if(usingRealAudio){
+    if(isPlaying){
+      // Each verse is its own complete file now - just play it from
+      // wherever currentTime currently sits (0 if freshly loaded, or
+      // mid-point if resuming after an interruption pause).
+      audio.play().catch(err=>{
+        showToast('Could not play audio - tap play again');
+        isPlaying = false;
+      });
+    } else {
+      audio.pause();
+    }
+  } else {
+    // No real recording for this verse yet - simulated progress bar so
+    // the rest of the app still works while content is still being
+    // produced and uploaded.
+    if(isPlaying){
+      playTimer = setInterval(()=>{
+        curPct += (100/SIMULATED_VERSE_SECONDS) * 0.2;
+        if(curPct >= 100){ curPct = 100; clearInterval(playTimer); onVerseEnd(); }
+        document.getElementById('progress-fill').style.width = curPct+'%';
+        document.getElementById('time-current').textContent = formatTime((curPct/100)*SIMULATED_VERSE_SECONDS);
+      }, 200);
+    } else {
+      clearInterval(playTimer);
+    }
+  }
+}
+
+document.getElementById('audio-element').addEventListener('error', function(){
+  if(this.dataset.hasRealAudio === 'true'){
+    showToast('Could not load audio file - check it was uploaded correctly');
+    this.dataset.hasRealAudio = 'false';
+  }
+});
+
+// Per-verse files mean no manual boundary math at all - just report the
+// file's own natural playback position as a percentage of its own
+// natural duration.
+document.getElementById('audio-element').addEventListener('timeupdate', function(){
+  if(!isPlaying) return;
+  if(this.dataset.hasRealAudio !== 'true') return;
+  if(!isFinite(this.duration) || this.duration <= 0) return;
+  const pct = Math.max(0, Math.min(100, (this.currentTime/this.duration)*100));
+  document.getElementById('progress-fill').style.width = pct+'%';
+  document.getElementById('time-current').textContent = formatTime(this.currentTime);
+});
+
+// The audio element's own 'ended' event fires exactly when the file
+// finishes - no boundary-guessing, no early/late cutoffs, since the
+// file IS the verse from start to finish.
+document.getElementById('audio-element').addEventListener('ended', function(){
+  if(this.dataset.hasRealAudio !== 'true') return;
+  document.getElementById('progress-fill').style.width = '100%';
+  document.getElementById('time-current').textContent = formatTime(this.duration);
+  onVerseEnd();
+});
+
+function skip(dir){
+  const pkg = packages[currentPkg];
+  const track = pkg.tracks[curTrackIdx];
+  let vi = curVerseIdx + dir;
+  document.getElementById('audio-element').pause();
+  if(vi < 0){
+    if(curTrackIdx>0){ curTrackIdx--; curVerseIdx = pkg.tracks[curTrackIdx].verses.length-1; loadPlayerTrack(); }
+  } else if(vi >= track.verses.length){
+    if(curTrackIdx < pkg.tracks.length-1){ curTrackIdx++; curVerseIdx=0; loadPlayerTrack(); }
+  } else {
+    curVerseIdx = vi; loadPlayerTrack();
+  }
+  if(isPlaying){ clearInterval(playTimer); isPlaying=false; togglePlay(); }
+}
+
+function onVerseEnd(){
+  clearInterval(playTimer);
+  const audio = document.getElementById('audio-element');
+  const usingRealAudio = audio.dataset.hasRealAudio === 'true';
+
+  if(loopMode === 'verse'){
+    curPct = 0;
+    document.getElementById('progress-fill').style.width='0%';
+    document.getElementById('time-current').textContent = '0:00';
+    if(usingRealAudio){
+      // Each verse is its own complete file now - looping it back just
+      // means restarting that same file from the beginning. No boundary
+      // to seek to within a larger track, so this can never bleed into
+      // a neighboring verse the way the old shared-file approach could.
+      audio.currentTime = 0;
+      audio.play();
+    } else {
+      togglePlay(); togglePlay(); // restarts the simulated timer cleanly
+    }
+    return;
+  }
+  if(playSource && playSource.type==='playlist' ){
+    if(loopMode==='playlist' || playlistPos < myPlaylist.length-1){
+      playlistPos = (playlistPos+1) % myPlaylist.length;
+      openPlaylistPlayer(playlistPos);
+      return;
+    }
+  } else {
+    const pkg = packages[currentPkg];
+    const track = pkg.tracks[curTrackIdx];
+    const hasNextVerse = curVerseIdx < track.verses.length-1;
+    const hasNextTrack = curTrackIdx < pkg.tracks.length-1;
+    if(hasNextVerse || hasNextTrack || loopMode==='track' || loopMode==='playlist'){
+      // isPlaying is still true at this point (we only paused the raw
+      // <audio> element, not the app's play/pause state), so skip()'s
+      // own isPlaying-driven restart logic handles resuming playback -
+      // calling togglePlay() again here would incorrectly flip it off.
+      skip(1);
+      return;
+    }
+  }
+  isPlaying = false;
+  document.getElementById('play-icon').innerHTML = '<path d="M8 5v14l11-7z"/>';
+  document.getElementById('glow-ring').classList.remove('breathing');
+  showToast('&#128293; Day 12 logged &mdash; come back tomorrow');
+}
+
+function cycleLoop(){
+  const order = playSource && playSource.type==='playlist'
+    ? ['off','verse','playlist']
+    : ['off','verse','track'];
+  const i = order.indexOf(loopMode);
+  loopMode = order[(i+1) % order.length];
+  updateLoopButtonUI();
+  const labels = {off:'Loop off', verse:'Looping this verse', track:'Looping this track', playlist:'Looping playlist'};
+  showToast(labels[loopMode]);
+}
+
+function updateLoopButtonUI(){
+  const btn = document.getElementById('loop-btn');
+  if(!btn) return;
+  btn.classList.toggle('loop-active', loopMode!=='off');
+  btn.title = loopMode;
+}
+
+function showPaywall(key){
+  pendingPkg = key;
+  const pkg = packages[key];
+  document.getElementById('sheet-title').innerHTML = 'Unlock Everything';
+  document.getElementById('sheet-sub-text').innerHTML = 'All packages &mdash; ' + pkg.name + ' and the rest &mdash; yours to keep, offline, forever';
+  document.getElementById('sheet-price').innerHTML = ALL_ACCESS_PRICE;
+  document.getElementById('paywall-overlay').classList.add('show');
+}
+function closeSheet(){ document.getElementById('paywall-overlay').classList.remove('show'); }
+
+async function handlePurchase(){
+  // Falls back to a mock unlock if no Paystack key is configured yet,
+  // so this prototype keeps working standalone during design/demo.
+  if(!PAYSTACK_PUBLIC_KEY || !BACKEND_URL){
+    mockPurchase();
+    return;
+  }
+
+  const sheetBtn = document.getElementById('pay-btn');
+  sheetBtn.disabled = true;
+  sheetBtn.textContent = 'Starting...';
+
+  try {
+    // Step 1: ask OUR backend to initialize the transaction.
+    // The backend holds the secret key and sets the real price -
+    // never trust a price coming from the browser.
+    const initRes = await fetch(BACKEND_URL + '/paystack-initialize', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ email: CURRENT_USER_EMAIL })
+    });
+    const initData = await initRes.json();
+    if(!initRes.ok) throw new Error(initData.error || 'Could not start payment');
+
+    // Step 2: open the Paystack popup using the access_code from our backend.
+    const popup = new PaystackPop();
+    popup.resumeTransaction(initData.access_code, {
+      onSuccess: async (response) => {
+        sheetBtn.textContent = 'Confirming...';
+        try {
+          // Step 3: ask OUR backend to verify the payment server-side
+          // before unlocking anything. Never unlock based on the
+          // frontend callback alone.
+          const verifyRes = await fetch(BACKEND_URL + '/paystack-verify', {
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body: JSON.stringify({ reference: response.reference, userId: CURRENT_USER_ID })
+          });
+          const verifyData = await verifyRes.json();
+          if(verifyRes.ok && verifyData.unlocked){
+            allAccessUnlocked = true;
+            saveState();
+            closeSheet();
+            showToast('&#10003; Unlocked everything &mdash; enjoy the full library');
+            renderHomePkgRow();
+            renderPackagesScreen();
+          } else {
+            showToast('Payment could not be confirmed. Contact support with reference '+response.reference);
+          }
+        } catch(e){
+          showToast('Could not confirm payment. Contact support with reference '+response.reference);
+        } finally {
+          sheetBtn.disabled = false;
+          sheetBtn.textContent = 'Pay with Paystack';
+        }
+      },
+      onCancel: () => {
+        sheetBtn.disabled = false;
+        sheetBtn.textContent = 'Pay with Paystack';
+      },
+      onError: (err) => {
+        showToast('Payment error: '+err.message);
+        sheetBtn.disabled = false;
+        sheetBtn.textContent = 'Pay with Paystack';
+      }
+    });
+  } catch(err){
+    showToast(err.message || 'Could not start payment');
+    sheetBtn.disabled = false;
+    sheetBtn.textContent = 'Pay with Paystack';
+  }
+}
+
+// Mock fallback - used only when PAYSTACK_PUBLIC_KEY / BACKEND_URL are blank,
+// so the prototype demos correctly before real keys are wired in.
+function mockPurchase(){
+  allAccessUnlocked = true;
+  saveState();
+  closeSheet();
+  showToast('&#10003; Unlocked everything &mdash; enjoy the full library &nbsp;<span style="opacity:.6">(mock)</span>');
+  renderHomePkgRow();
+  renderPackagesScreen();
+  setTimeout(()=>openPackage(pendingPkg), 400);
+}
+
+function renderPlaylist(){
+  renderOwnVerses();
+  const body = document.getElementById('playlist-body');
+  const countEl = document.getElementById('playlist-count');
+  countEl.textContent = myPlaylist.length + (myPlaylist.length===1 ? ' verse' : ' verses');
+  document.getElementById('playlist-loop-link').textContent =
+    'Loop: ' + (loopMode==='off' ? 'Off' : loopMode==='playlist' ? 'All' : 'One');
+
+  if(myPlaylist.length===0){
+    body.innerHTML = `<div class="empty-state">
+      <div class="icon">&#127911;</div>
+      <div class="title">Nothing here yet</div>
+      <div class="sub">Tap "+ My Playlist" on any verse &mdash; even in a package you haven't unlocked &mdash; to build your own loop.</div>
+    </div>`;
+    return;
+  }
+
+  body.innerHTML = myPlaylist.map((item,i)=>{
+    const pkg = packages[item.pkg];
+    const verse = pkg.tracks[item.trackIdx].verses[item.verseIdx];
+    const locked = !hasAccess(pkg);
+    return `<div class="playlist-item">
+      <div class="playlist-num">${i+1}</div>
+      <div class="playlist-info" onclick="${locked ? `showPaywall('${item.pkg}')` : `openPlaylistPlayer(${i})`}">
+        <div class="playlist-ref">${verse.ref} ${locked ? '&#128274;' : ''}</div>
+        <div class="playlist-pkg">${pkg.name}${locked ? ' &middot; locked' : ''}</div>
+      </div>
+      <button class="playlist-remove" onclick="removeFromPlaylist(${i})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+    </div>`;
+  }).join('');
+}
+
+function removeFromPlaylist(i){
+  myPlaylist.splice(i,1);
+  saveState();
+  renderPlaylist();
+  showToast('Removed from My Playlist');
+}
+
+function cycleLoopFromPlaylist(){
+  const order = ['off','playlist','verse'];
+  const i = order.indexOf(loopMode);
+  loopMode = order[(i+1) % order.length];
+  renderPlaylist();
+}
+
+// ===================================================================
+// MEMORY VERSE / FAMILY / CHALLENGE RENDERING
+// ===================================================================
+
+function renderMemberSwitcher(){
+  const el = document.getElementById('member-switcher');
+  if(!el) return;
+  el.innerHTML = household.memberOrder.map(mid=>{
+    const m = household.members[mid];
+    const prog = memberProgress[mid];
+    return `<div class="member-chip ${mid===currentMemberId?'active':''}" onclick="switchMember('${mid}')">
+      <div class="m-avatar">${m.avatar}</div>
+      <div><div class="m-name">${m.name}</div><div class="m-streak">&#128293; ${prog.streak}</div></div>
+    </div>`;
+  }).join('') + `<div class="member-chip" onclick="goTo('family')" style="color:var(--parchment-dim)">+ Add</div>`;
+}
+
+function switchMember(mid){
+  currentMemberId = mid;
+  renderMemberSwitcher();
+  renderDailyVerseCard();
+  renderChallengeList();
+  document.getElementById('flame-num').textContent = memberProgress[mid].streak;
+}
+
+function renderDailyVerseCard(){
+  const el = document.getElementById('daily-verse-card');
+  if(!el) return;
+  const dv = getDailyVerseForMember(currentMemberId);
+  const mastery = getMastery(currentMemberId, dv.pkgKey, dv.trackIdx, dv.verseIdx);
+  const order = ['new','learning','familiar','mastered'];
+  const pipsOn = order.indexOf(mastery)+1;
+  el.innerHTML = `
+    <div class="dv-pkg">${dv.pkgName}</div>
+    <div class="dv-ref">${dv.verse.ref}</div>
+    <div class="dv-text">"${dv.verse.text}"</div>
+    <div class="mastery-pip">${order.map((o,i)=>`<span class="${i<pipsOn?'on':''}"></span>`).join('')}</div>
+    <div class="dv-actions" style="margin-top:14px">
+      <button class="dv-btn primary" onclick="openPlayer('${dv.pkgKey}',${dv.trackIdx},${dv.verseIdx})">Listen</button>
+      <button class="dv-btn" onclick="markVerseReviewed('${dv.pkgKey}',${dv.trackIdx},${dv.verseIdx})">I know this &#10003;</button>
+    </div>`;
+}
+
+function markVerseReviewed(pkgKey, trackIdx, verseIdx){
+  advanceMastery(currentMemberId, pkgKey, trackIdx, verseIdx);
+  saveState();
+  renderDailyVerseCard();
+  const status = getMastery(currentMemberId, pkgKey, trackIdx, verseIdx);
+  showToast(status==='mastered' ? '&#127881; Verse mastered!' : 'Marked as '+status);
+}
+
+function renderChallengeList(){
+  const el = document.getElementById('challenge-list');
+  if(!el) return;
+  const challenges = memberProgress[currentMemberId].activeChallenges;
+  if(challenges.length === 0){
+    el.innerHTML = `<div class="empty-state" style="padding:30px 10px">
+      <div class="icon">&#128197;</div>
+      <div class="title">No active challenge</div>
+      <div class="sub">Start a 7-day challenge to memorize one verse, one day at a time.</div>
+    </div>`;
+    return;
+  }
+  el.innerHTML = challenges.map(ch=>{
+    const pkg = packages[ch.pkgKey];
+    const verse = pkg.tracks[ch.trackIdx].verses[ch.verseIdx];
+    const dayNum = ch.daysCompleted.length+1;
+    return `<div class="challenge-card">
+      <div class="challenge-top">
+        <div class="challenge-ref">${verse.ref}</div>
+        <div class="challenge-day">Day ${Math.min(dayNum,7)} of 7</div>
+      </div>
+      <div class="challenge-dots">${[1,2,3,4,5,6,7].map(d=>`<div class="cdot ${ch.daysCompleted.includes(d)?'done':''}"></div>`).join('')}</div>
+      <div class="dv-actions" style="margin-top:12px">
+        <button class="dv-btn primary" onclick="completeChallengeDay('${ch.id}')">Mark today done</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function completeChallengeDay(challengeId){
+  const ch = memberProgress[currentMemberId].activeChallenges.find(c=>c.id===challengeId);
+  if(!ch) return;
+  const nextDay = ch.daysCompleted.length+1;
+  if(nextDay<=7){ ch.daysCompleted.push(nextDay); }
+  saveState();
+  renderChallengeList();
+  showToast(nextDay>=7 ? '&#127881; 7-day challenge complete!' : 'Day '+nextDay+' of 7 done');
+}
+
+function openNewChallengeSheet(){
+  // Simplified: starts a challenge on today's daily verse for the current member.
+  const dv = getDailyVerseForMember(currentMemberId);
+  startChallenge([currentMemberId], dv.pkgKey, dv.trackIdx, dv.verseIdx);
+  renderChallengeList();
+  showToast('7-day challenge started: '+dv.verse.ref);
+}
+
+function renderFamilyProgressRow(){
+  const el = document.getElementById('family-progress-row');
+  if(!el) return;
+  el.innerHTML = household.memberOrder.map(mid=>
+    `<div class="fc-avatar">${household.members[mid].avatar}</div>`
+  ).join('');
+}
+
+function renderFamilyScreen(){
+  const el = document.getElementById('family-member-list');
+  if(!el) return;
+  el.innerHTML = household.memberOrder.map(mid=>{
+    const m = household.members[mid];
+    const p = memberProgress[mid];
+    return `<div class="family-member-row">
+      <div class="m-avatar-lg">${m.avatar}</div>
+      <div class="m-info">
+        <div class="m-name-lg">${m.name}${m.isPrimary?' (you)':''}</div>
+        <div class="m-stats">&#128293; ${p.streak} day streak &middot; ${p.totalListens} listens</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function addFamilyMember(){
+  const n = household.memberOrder.length;
+  const newId = 'member'+(n+1);
+  const avatars = ['&#128118;','&#128119;','&#128117;','&#128104;'];
+  household.members[newId] = { id:newId, name:'Family Member '+n, isPrimary:false, avatar: avatars[n%avatars.length] };
+  household.memberOrder.push(newId);
+  memberProgress[newId] = { streak:0, totalListens:0, verseMastery:{}, activeChallenges:[] };
+  renderFamilyScreen();
+  renderMemberSwitcher();
+  renderFamilyProgressRow();
+  showToast('Family member added');
+}
+
+function startParentChildTrack(){
+  const dv = getDailyVerseForMember('me');
+  startChallenge(household.memberOrder, dv.pkgKey, dv.trackIdx, dv.verseIdx);
+  showToast('Parent-child track started for everyone');
+  goTo('streaks');
+  renderChallengeList();
+}
+
+function renderHomePkgRow(){
+  const row = document.getElementById('home-pkg-row');
+  const keys = ['healing','faith','mothers','fathers'];
+  row.innerHTML = keys.map(key=>{
+    const p = packages[key];
+    const locked = !hasAccess(p);
+    return `<div class="pkg-spine" style="background:linear-gradient(160deg,${p.color},#16110D)" onclick="openPackage('${key}')">
+      <div class="pkg-icon">${p.icon}</div>
+      <div><div class="pkg-name">${p.name.replace(' &amp; ',' & ').replace('Scriptures','').replace('For ','')}</div><div class="pkg-count">${p.tracks.length} tracks</div></div>
+      ${locked ? `<div class="lock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg></div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function renderGreeting(){
+  const now = new Date();
+  const hour = now.getHours();
+  const greeting = hour < 12 ? 'Good morning.' : hour < 17 ? 'Good afternoon.' : 'Good evening.';
+  const dateStr = now.toLocaleDateString(undefined, { weekday:'long', month:'long', day:'numeric' });
+  const gEl = document.getElementById('home-greeting');
+  const dEl = document.getElementById('home-date');
+  if(gEl) gEl.textContent = greeting;
+  if(dEl) dEl.textContent = dateStr;
+}
+
+// ===================================================================
+// PERSISTENCE
+// Saves key state to this device's localStorage so progress survives
+// closing the app and reopening it. This is a real, working fix for
+// "the app starts afresh every time" on a single phone/browser - it is
+// NOT the same as real user accounts (which would sync across devices
+// and survive clearing browser data); that still needs a real backend.
+// But it solves the immediate, more urgent problem: using the app
+// normally, day to day, on one phone, should not reset your streak,
+// your purchases, or your downloads every time you reopen it.
+// ===================================================================
+const STORAGE_KEY = 'vestule_revive_state_v1';
+
+function saveState(){
+  try{
+    const state = {
+      allAccessUnlocked, downloadStatus, ownVerses, myPlaylist,
+      memberProgress, currentMemberId,
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch(e){
+    console.warn('Could not save app state', e);
+  }
+}
+
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return false;
+    const state = JSON.parse(raw);
+    if(state.allAccessUnlocked !== undefined) allAccessUnlocked = state.allAccessUnlocked;
+    if(state.downloadStatus) downloadStatus = state.downloadStatus;
+    if(state.ownVerses) ownVerses = state.ownVerses;
+    if(state.myPlaylist) myPlaylist = state.myPlaylist;
+    if(state.memberProgress) memberProgress = state.memberProgress;
+    if(state.currentMemberId) currentMemberId = state.currentMemberId;
+    return true;
+  } catch(e){
+    console.warn('Could not load saved app state', e);
+    return false;
+  }
+}
+
+// Initial render
+const hadSavedState = loadState();
+renderGreeting();
+renderHomePkgRow();
+renderPackagesScreen();
+
+// Healing auto-downloads only the very first time the app is ever
+// opened on this device. If we already have saved state (including
+// from a prior download), we respect whatever that saved status was -
+// this is the fix for the "ready offline" toast firing on every single
+// refresh: it now only fires once, ever, per device.
+if(!hadSavedState || downloadStatus.healing === undefined){
+  startDownload('healing');
+} else if(downloadStatus.healing === 'downloading'){
+  // App was closed mid-download last time - just mark it done rather
+  // than restarting the animation, since we can't know real progress.
+  downloadStatus.healing = 'done';
+  saveState();
+}
+
+function toggleSwitch(el){ el.classList.toggle('on'); }
+
+// ===================================================================
+// MY OWN VERSES (personal journal, private, on-device TTS)
+// ===================================================================
+
+function openAddOwnVerseSheet(){
+  document.getElementById('ov-ref-input').value = '';
+  document.getElementById('ov-text-input').value = '';
+  document.getElementById('ownverse-overlay').classList.add('show');
+}
+
+function closeOwnVerseSheet(){
+  document.getElementById('ownverse-overlay').classList.remove('show');
+}
+
+function saveOwnVerse(){
+  const text = document.getElementById('ov-text-input').value.trim();
+  if(!text){ showToast('Type the verse text first'); return; }
+  const ref = document.getElementById('ov-ref-input').value.trim() || 'My Verse';
+  ownVerses.unshift({ id:'ov_'+Date.now(), ref, text, addedAt:new Date().toISOString() });
+  saveState();
+  closeOwnVerseSheet();
+  renderOwnVerses();
+  showToast('&#10003; Saved to My Own Verses');
+}
+
+function deleteOwnVerse(id){
+  ownVerses = ownVerses.filter(v=>v.id!==id);
+  saveState();
+  renderOwnVerses();
+}
+
+// Loop mode for the personal journal, separate from the curated playlist's
+// loop. 'off' = play once and stop. 'one' = repeat the same verse on a
+// loop, ideal for memorization through repetition. 'all' = cycle through
+// every saved verse in order, looping back to the first after the last.
+let ownVerseLoopMode = 'off';
+let ownVerseLoopId = null; // which verse id is currently set to keep looping
+
+function speakOwnVerse(id, isLoopContinuation){
+  const v = ownVerses.find(x=>x.id===id);
+  if(!v) return;
+  if(!('speechSynthesis' in window)){
+    showToast('Text-to-speech is not supported in this browser');
+    return;
+  }
+  window.speechSynthesis.cancel();
+  // Web Speech API's SpeechSynthesis: the phone's own built-in voice.
+  // Works fully offline once the voice is installed on-device (true for
+  // virtually all modern iOS/Android browsers) - no server call, no cost,
+  // no internet dependency. This is intentionally a different, simpler
+  // voice than the professionally recorded packages: it signals "this is
+  // your personal addition," not official content.
+  const utterance = new SpeechSynthesisUtterance(v.ref + '. ' + v.text);
+  utterance.rate = 0.85;
+
+  utterance.onend = () => {
+    if(ownVerseLoopMode === 'one' && ownVerseLoopId === id){
+      // Repeat the same verse again - built specifically for memorization
+      // through repetition, not just a generic "replay" button.
+      speakOwnVerse(id, true);
+    } else if(ownVerseLoopMode === 'all'){
+      const idx = ownVerses.findIndex(x=>x.id===id);
+      const nextIdx = (idx+1) % ownVerses.length;
+      speakOwnVerse(ownVerses[nextIdx].id, true);
+    }
+  };
+
+  if(!isLoopContinuation){
+    ownVerseLoopId = id;
+  }
+  window.speechSynthesis.speak(utterance);
+  renderOwnVerses();
+}
+
+function stopOwnVersePlayback(){
+  window.speechSynthesis.cancel();
+  ownVerseLoopId = null;
+  renderOwnVerses();
+}
+
+function cycleOwnVerseLoop(){
+  const order = ['off','one','all'];
+  const i = order.indexOf(ownVerseLoopMode);
+  ownVerseLoopMode = order[(i+1) % order.length];
+  const labels = {off:'Loop off', one:'Looping this verse', all:'Looping all your verses'};
+  showToast(labels[ownVerseLoopMode]);
+  renderOwnVerses();
+}
+
+function renderOwnVerses(){
+  const el = document.getElementById('own-verses-list');
+  if(!el) return;
+  const isSpeaking = window.speechSynthesis && window.speechSynthesis.speaking;
+
+  const headerHTML = ownVerses.length > 0 ? `
+    <div class="own-verse-loop-row">
+      <button class="ov-loop-btn ${ownVerseLoopMode!=='off' ? 'active':''}" onclick="cycleOwnVerseLoop()">
+        &#128257; ${ownVerseLoopMode==='off' ? 'Loop: Off' : ownVerseLoopMode==='one' ? 'Loop: This Verse' : 'Loop: All'}
+      </button>
+    </div>` : '';
+
+  if(ownVerses.length === 0){
+    el.innerHTML = `<div class="empty-state" style="padding:24px 10px">
+      <div class="icon">&#128214;</div>
+      <div class="sub">Heard something at church or from a friend? Add it here - just for you. No limit - add as many as you want, whenever you want.</div>
+    </div>`;
+    return;
+  }
+  el.innerHTML = headerHTML + ownVerses.map(v=>{
+    const isCurrentlyPlaying = isSpeaking && ownVerseLoopId === v.id;
+    return `
+    <div class="own-verse-card ${isCurrentlyPlaying ? 'playing':''}">
+      <div class="own-verse-top">
+        <div class="own-verse-ref">${v.ref}</div>
+        <button class="ov-delete" onclick="deleteOwnVerse('${v.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+      </div>
+      <div class="own-verse-text">"${v.text}"</div>
+      <div class="own-verse-actions">
+        ${isCurrentlyPlaying
+          ? `<button class="ov-btn primary" onclick="stopOwnVersePlayback()">&#9632; Stop</button>`
+          : `<button class="ov-btn primary" onclick="speakOwnVerse('${v.id}')">&#128266; Listen</button>`}
+        <span class="ov-tts-badge" style="align-self:center">On-device voice &middot; offline</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+
+function showToast(html){
+  const t = document.getElementById('toast');
+  t.innerHTML = html;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(()=>t.classList.remove('show'), 2600);
+}
+</script>
+</body>
+</html>
